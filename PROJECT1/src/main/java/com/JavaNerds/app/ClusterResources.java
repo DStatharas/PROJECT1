@@ -2,41 +2,48 @@ package com.JavaNerds.app;
 
 public class ClusterResources {
     //constant?
-    private static Integer cpu = 128;
-    private static Integer ram = 256;
-    private static Integer ssd = 2048;
-    private static Integer gpu = 8;
-    private static Integer bandwidth = 320;
+    private static Integer clcpu;
+    private static Integer clram;
+    private static Integer clssd;
+    private static Integer clgpu;
+    private static Integer clbandwidth;
 
-    public static Integer getCpu() {
-        return cpu;
+    public ClusterResources (Integer clcpu, Integer clram, Integer clssd, Integer clgpu, Integer clbandwidth){
+        ClusterResources.clcpu = clcpu;
+        ClusterResources.clssd = clssd;
+        ClusterResources.clgpu = clgpu;
+        ClusterResources.clbandwidth = clbandwidth;
     }
-    public static void setCpu(Integer cpu) {
-        ClusterResources.cpu = cpu;
+
+    public static Integer getClcpu() {
+        return clcpu;
     }
-    public static Integer getRam() {
-        return ram;
+    public static void setClcpu(Integer clcpu) {
+        ClusterResources.clcpu = clcpu;
     }
-    public static void setRam(Integer ram) {
-        ClusterResources.ram = ram;
+    public static Integer getClram() {
+        return clram;
     }
-    public static Integer getSsd() {
-        return ssd;
+    public static void setClram(Integer clram) {
+        ClusterResources.clram = clram;
     }
-    public static void setSsd(Integer ssd) {
-        ClusterResources.ssd = ssd;
+    public static Integer getClssd() {
+        return clssd;
     }
-    public static Integer getGpu() {
-        return gpu;
+    public static void setClssd(Integer clssd) {
+        ClusterResources.clssd = clssd;
     }
-    public static void setGpu(Integer gpu) {
-        ClusterResources.gpu = gpu;
+    public static Integer getClgpu() {
+        return clgpu;
     }
-    public static Integer getBandwidth() {
-        return bandwidth;
+    public static void setClgpu(Integer clgpu) {
+        ClusterResources.clgpu = clgpu;
     }
-    public static void setBandwidth(Integer bandwidth) {
-        ClusterResources.bandwidth = bandwidth;
+    public static Integer getClbandwidth() {
+        return clbandwidth;
+    }
+    public static void setClbandwidth(Integer clbandwidth) {
+        ClusterResources.clbandwidth = clbandwidth;
     }
 
 }

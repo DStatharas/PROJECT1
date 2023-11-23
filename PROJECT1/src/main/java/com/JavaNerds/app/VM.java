@@ -1,13 +1,25 @@
 package com.JavaNerds.app;
 
-abstract class VM implements iVMMethods{
+abstract class VM{
     //a sequential vmid
 
+    protected String os;
     protected Integer vmid;
     protected Integer cpu;
     protected Integer ram;
-    protected String[] os = {"WINDOWS", "UBUNTU", "FEDORA"};
 
+    public String getOs() {
+        return os;
+    }
+    public void setOs(String os) {
+        this.os = os;
+    }
+    public Integer getVmid() {
+        return vmid;
+    }
+    public void setVmid(Integer vmid) {
+        this.vmid = vmid;
+    }
     public Integer getCpu() {
         return cpu;
     }
@@ -20,5 +32,6 @@ abstract class VM implements iVMMethods{
     public void setRam(Integer ram) {
         this.ram = ram;
     }
-
+    
+    
 }

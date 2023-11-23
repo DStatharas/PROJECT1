@@ -1,20 +1,14 @@
 package com.JavaNerds.app;
 
-public class VMGPU extends PlainVM{
-    protected Integer gpu;
+public class VmGPU extends PlainVM{
+    protected Integer vmgpu;
 
-    public VMGPU (Integer cpu, Integer ram, int os, Integer gpu){
-        super(cpu, ram, os);
-        this.gpu = gpu;
+    public Integer getVmgpu() {
+        return vmgpu;
     }
 
-    public Integer getGpu() {
-        return gpu;
+    public void setVmgpu(Integer vmgpu) {
+        this.vmgpu = vmgpu;
     }
 
-    public void setGpu(Integer gpu) {
-        this.gpu = gpu;
-    }
-    
-    
 }

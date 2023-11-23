@@ -1,19 +1,14 @@
 package com.JavaNerds.app;
 
-public class VMNetworked extends PlainVM{
-    private Integer bandwidth;
+public class VmNetworked extends PlainVM{
+    private Integer vmbandwidth;
 
-    public VMNetworked (Integer vmid, Integer cpu, Integer ram, int os, Integer bandwidth){
-        super(vmid, cpu, ram, os);
-        this.bandwidth = bandwidth;
+    public Integer getVmbandwidth() {
+        return vmbandwidth;
     }
 
-    public Integer getBandwidth() {
-        return bandwidth;
-    }
-
-    public void setBandwidth(Integer bandwidth) {
-        this.bandwidth = bandwidth;
+    public void setVmbandwidth(Integer vmbandwidth) {
+        this.vmbandwidth = vmbandwidth;
     }
 
 }
