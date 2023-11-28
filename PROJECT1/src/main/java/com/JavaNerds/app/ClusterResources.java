@@ -1,7 +1,11 @@
 package com.JavaNerds.app;
 
+import java.util.ArrayList;
+
 public class ClusterResources {
-    //constant?
+
+    public static ArrayList<VM> vmArray = new ArrayList<>();
+
     private static Integer clcpu;
     private static Integer clram;
     private static Integer clssd;
@@ -13,6 +17,10 @@ public class ClusterResources {
         ClusterResources.clssd = clssd;
         ClusterResources.clgpu = clgpu;
         ClusterResources.clbandwidth = clbandwidth;
+    }
+
+    public static Integer getVmArrayLength() {
+        return vmArray.size();
     }
 
     public static Integer getClcpu() {

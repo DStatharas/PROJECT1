@@ -1,15 +1,19 @@
 package com.JavaNerds.app;
 
 public class PlainVM extends VM{
-    protected Integer ssd;
+    protected Integer vmssd;
 
-    public Integer getSsd() {
-        return ssd;
+    public PlainVM(Integer vmid, Integer vmcpu, Integer vmram, Integer vmssd) {
+        super(vmid, vmcpu, vmram);
+        this.vmssd = vmssd;
     }
 
-    public void setSsd(Integer ssd) {
-        this.ssd = ssd;
+    public Integer getVmssd() {
+        return vmssd;
     }
 
+    public void setVmssd(Integer vmssd) {
+        this.vmssd = vmssd;
+    }
     
 }

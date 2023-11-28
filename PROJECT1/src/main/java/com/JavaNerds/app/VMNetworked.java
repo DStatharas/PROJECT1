@@ -3,6 +3,11 @@ package com.JavaNerds.app;
 public class VmNetworked extends PlainVM{
     private Integer vmbandwidth;
 
+    public VmNetworked(Integer vmid, Integer vmcpu, Integer vmram, Integer vmssd, Integer vmbandwidth) {
+        super(vmid, vmcpu, vmram, vmssd);
+        this.vmbandwidth = vmbandwidth;
+    }
+
     public Integer getVmbandwidth() {
         return vmbandwidth;
     }

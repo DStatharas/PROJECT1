@@ -1,18 +1,23 @@
 package com.JavaNerds.app;
 
 abstract class VM{
-    //a sequential vmid
 
-    protected String os;
+    protected String vmos;
     protected Integer vmid;
-    protected Integer cpu;
-    protected Integer ram;
+    protected Integer vmcpu;
+    protected Integer vmram;
 
-    public String getOs() {
-        return os;
+    public VM(Integer vmid, Integer vmcpu, Integer vmram) {
+        this.vmid = vmid;
+        this.vmcpu = vmcpu;
+        this.vmram = vmram;
     }
-    public void setOs(String os) {
-        this.os = os;
+
+    public String getVmos() {
+        return vmos;
+    }
+    public void setVmos(String vmos) {
+        this.vmos = vmos;
     }
     public Integer getVmid() {
         return vmid;
@@ -20,18 +25,17 @@ abstract class VM{
     public void setVmid(Integer vmid) {
         this.vmid = vmid;
     }
-    public Integer getCpu() {
-        return cpu;
+    public Integer getVmcpu() {
+        return vmcpu;
     }
-    public void setCpu(Integer cpu) {
-        this.cpu = cpu;
+    public void setVmcpu(Integer vmcpu) {
+        this.vmcpu = vmcpu;
     }
-    public Integer getRam() {
-        return ram;
+    public Integer getVmram() {
+        return vmram;
     }
-    public void setRam(Integer ram) {
-        this.ram = ram;
+    public void setVmram(Integer vmram) {
+        this.vmram = vmram;
     }
-    
-    
+
 }
