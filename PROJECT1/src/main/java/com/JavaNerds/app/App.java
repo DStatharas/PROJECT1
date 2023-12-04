@@ -2,24 +2,37 @@ package com.JavaNerds.app;
 
 import java.util.Scanner;
 
-public class App 
+public class App
 {
     public static void main( String[] args )
     {
-        Scanner myObj = new Scanner(System.in);
-        String oneString;
-        Integer oneInt = 3;
-        Boolean esc = false;
+        Integer x = null;
+        // while (true) {
+        //     Scanner myScanner = new Scanner(System.in);
+        //     Integer i;
+        //     Integer g;
+        //     Integer d;
+        //     try {
+        //         System.out.println("Input");
+        //         i = myScanner.nextInt();
+        //         myScanner.nextLine();
+        //         g = myScanner.nextInt();
+        //         myScanner.nextLine();
+        //         d = myScanner.nextInt();
+        //         myScanner.nextLine();
+        //     } catch (Exception e) {
+        //         System.out.println("ERROR: Invalid input!");
+        //         myScanner.nextLine();
+        //         continue;
+        //     }
+        //     System.out.println("othercode");
+        //}
 
-        while (esc == false) {
-            try {
-                oneInt = myObj.nextInt();
-                myObj.nextLine();
-                esc = true;
-            } catch (Exception e) {
-                myObj.nextLine();
-                esc = false;
-            }
+        try {
+            System.out.println(x);
+            System.out.println("success"+x);
+        } catch (Exception e) {
+            System.out.println("fail"+x);
         }
     }
 }

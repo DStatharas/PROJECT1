@@ -2,23 +2,21 @@ package com.JavaNerds.app;
 
 abstract class VM{
 
-    protected String vmos;
+    static Integer vmIdGen = 1;
     protected Integer vmid;
     protected Integer vmcpu;
     protected Integer vmram;
+    protected String vmOs;
+    protected String[] vmOsOptions = {"WINDOWS", "UBUNTU", "FEDORA"};
 
-    public VM(Integer vmid, Integer vmcpu, Integer vmram) {
-        this.vmid = vmid;
+    public VM(Integer vmOs, Integer vmcpu, Integer vmram) {
+        this.vmid = vmIdGen;
+        VM.vmIdGen+=1;
+        this.vmOs = vmOsOptions[vmOs];
         this.vmcpu = vmcpu;
         this.vmram = vmram;
     }
 
-    public String getVmos() {
-        return vmos;
-    }
-    public void setVmos(String vmos) {
-        this.vmos = vmos;
-    }
     public Integer getVmid() {
         return vmid;
     }
