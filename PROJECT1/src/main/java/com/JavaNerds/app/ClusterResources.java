@@ -4,54 +4,71 @@ import java.util.ArrayList;
 
 public class ClusterResources {
 
+    private static ClusterResources singleInstance = null;
+
     public static ArrayList<VM> vmArray = new ArrayList<>();
 
-    private static Integer clcpu;
-    private static Integer clram;
-    private static Integer clssd;
-    private static Integer clgpu;
-    private static Integer clbandwidth;
+    private Integer clcpu = 128;
+    private Integer clram = 256;
+    private Integer clssd = 2048;
+    private Integer clgpu = 8;
+    private Integer clbandwidth = 320;
 
-    public ClusterResources (Integer clcpu, Integer clram, Integer clssd, Integer clgpu, Integer clbandwidth){
-        ClusterResources.clcpu = clcpu;
-        ClusterResources.clssd = clssd;
-        ClusterResources.clgpu = clgpu;
-        ClusterResources.clbandwidth = clbandwidth;
+    private ClusterResources () {
+        System.out.println("Cluster created!");
+    }
+
+    public static synchronized ClusterResources getInstance() {
+        if (singleInstance == null) {
+            singleInstance = new ClusterResources();
+        }
+        
+        return singleInstance;
     }
 
     public static Integer getVmArrayLength() {
         return vmArray.size();
     }
 
-    public static Integer getClcpu() {
+    public Integer getClcpu() {
         return clcpu;
     }
-    public static void setClcpu(Integer clcpu) {
-        ClusterResources.clcpu = clcpu;
-    }
-    public static Integer getClram() {
-        return clram;
-    }
-    public static void setClram(Integer clram) {
-        ClusterResources.clram = clram;
-    }
-    public static Integer getClssd() {
-        return clssd;
-    }
-    public static void setClssd(Integer clssd) {
-        ClusterResources.clssd = clssd;
-    }
-    public static Integer getClgpu() {
-        return clgpu;
-    }
-    public static void setClgpu(Integer clgpu) {
-        ClusterResources.clgpu = clgpu;
-    }
-    public static Integer getClbandwidth() {
-        return clbandwidth;
-    }
-    public static void setClbandwidth(Integer clbandwidth) {
-        ClusterResources.clbandwidth = clbandwidth;
+
+    public void setClcpu(Integer clcpu) {
+        this.clcpu = clcpu;
     }
 
+    public Integer getClram() {
+        return clram;
+    }
+
+    public void setClram(Integer clram) {
+        this.clram = clram;
+    }
+
+    public Integer getClssd() {
+        return clssd;
+    }
+
+    public void setClssd(Integer clssd) {
+        this.clssd = clssd;
+    }
+
+    public Integer getClgpu() {
+        return clgpu;
+    }
+
+    public void setClgpu(Integer clgpu) {
+        this.clgpu = clgpu;
+    }
+
+    public Integer getClbandwidth() {
+        return clbandwidth;
+    }
+
+    public void setClbandwidth(Integer clbandwidth) {
+        this.clbandwidth = clbandwidth;
+    }
+
+    
 }

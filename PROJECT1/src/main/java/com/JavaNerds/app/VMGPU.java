@@ -8,6 +8,12 @@ public class VmGPU extends PlainVM{
         this.vmgpu = vmgpu;
     }
     
+    @Override
+    public void printVmReport() {
+        super.printVmReport();
+        System.out.println("VM GPUs: "+this.vmgpu+" GB");
+    }
+
     public Integer getVmgpu() {
         return vmgpu;
     }

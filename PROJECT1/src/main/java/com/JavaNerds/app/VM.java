@@ -17,6 +17,13 @@ abstract class VM{
         this.vmram = vmram;
     }
 
+    public void printVmReport() {
+        System.out.println("VM"+this.vmid+"Report:"+"\n"+
+        "OS: "+this.vmOs+"\n"+
+        "CPU Cores: "+this.vmcpu+"\n"+
+        "RAM: "+this.vmram+" GB");
+    }
+
     public Integer getVmid() {
         return vmid;
     }

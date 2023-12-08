@@ -8,6 +8,12 @@ public class PlainVM extends VM{
         this.vmssd = vmssd;
     }
 
+    @Override
+    public void printVmReport() {
+        super.printVmReport();
+        System.out.println("VM SSD: "+this.vmssd+" GB");
+    }
+
     public Integer getVmssd() {
         return vmssd;
     }

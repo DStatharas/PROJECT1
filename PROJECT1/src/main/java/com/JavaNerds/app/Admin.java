@@ -3,7 +3,8 @@ package com.JavaNerds.app;
 import java.util.Scanner;
 
 public class Admin{
-    private ClusterResources cluster = new ClusterResources(128, 256, 2048, 8, 320);
+    
+    ClusterResources adminCluster = ClusterResources.getInstance();
 
     Scanner oneScanner = new Scanner(System.in);
 
@@ -15,10 +16,11 @@ public class Admin{
     private Integer userGpu = null;
     private Integer userBandwidth = null;
     private Integer userOs = null;
+    private Integer tempVmId = null;
     
     public void createVM() {
         mloop:
-        do {
+        while (true) {
             inputChecker = null;
             userVmType = null;
             userCpu = null;
@@ -93,10 +95,11 @@ public class Admin{
                                 System.out.println("CPU cores are required!");
                                 continue;
                             }
-                            else if (userCpu > ClusterResources.getClcpu()) {
-                                System.out.println("Not enough resources available!");
+                            else if (userCpu > adminCluster.getClcpu()) {
+                                System.out.println("Not enough resources available on the cluster!");
                                 continue;
                             }
+
                             break;
                         }
 
@@ -121,10 +124,11 @@ public class Admin{
                                 System.out.println("RAM is required!");
                                 continue;
                             }
-                            else if (userRam > ClusterResources.getClcpu()) {
-                                System.out.println("Not enough resources available!");
+                            else if (userRam > adminCluster.getClram()) {
+                                System.out.println("Not enough resources available on the cluster!");
                                 continue;
                             }
+
                             break;
                         }
 
@@ -149,15 +153,20 @@ public class Admin{
                                 System.out.println("SSD storage is required!");
                                 continue;
                             }
-                            else if (userSsd > ClusterResources.getClcpu()) {
-                                System.out.println("Not enough resources available!");
+                            else if (userSsd > adminCluster.getClssd()) {
+                                System.out.println("Not enough resources available on the cluster!");
                                 continue;
                             }
+
                             break;
                         }
 
+                        adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
+                        adminCluster.setClram(adminCluster.getClram()-userRam);
+                        adminCluster.setClssd(adminCluster.getClssd()-userSsd);                        
+
                         ClusterResources.vmArray.add(new PlainVM(userOs, userCpu, userRam, userSsd));
-                        break; 
+                        break;
                     }
             
                 case 2:
@@ -180,16 +189,51 @@ public class Admin{
                     System.out.println("Please choose a valid type of Virtual Machine!");
                     continue;
             }
-        } while (true);
+        }
     }
 
     //hashmap (or something) return type
     private void addResources() {
-        
+                
     }
 
-    // public void deleteVm(){
+    public void deleteVm(){
+        while (true) {
+            inputChecker = null;
+            tempVmId = null;
+            System.out.println("Enter the ID of the VM you want to delete or Q to cancel:");
+            inputChecker = oneScanner.next();
+            oneScanner.nextLine();
 
-    // }
+            if (inputChecker.equalsIgnoreCase("q")) {
+                break;
+            }
+            else {
+                try {
+                    tempVmId = Integer.parseInt(inputChecker);
+                } catch (Exception e) {
+                    System.out.println("ERROR: Invalid input!");
+                    continue;
+                }
+            }
+            
+            try {
+                ClusterResources.vmArray.remove(tempVmId-1);
+            } catch (Exception e) {
+                System.out.println("This VM id does not exist!");
+                continue;
+            }
+            break;
+        }
+    }
+
+    public void printClusterReport() {
+        System.out.println("Cluster Report:"+"\n"+
+        "Cluster CPU Cores: "+adminCluster.getClcpu()+"\n"+
+        "Cluster RAM: "+adminCluster.getClram()+" GB"+"\n"+
+        "Cluster SSD: "+adminCluster.getClssd()+" GB"+"\n"+
+        "Cluster GPUs: "+adminCluster.getClgpu()+"\n"+
+        "Cluster Bandwidth: "+adminCluster.getClbandwidth()+" Gb/sec");
+    }
 
 }
