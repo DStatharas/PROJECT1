@@ -2,9 +2,10 @@ package com.JavaNerds.app;
 
 public class PlainVM extends VM{
     protected Integer vmssd;
+    
 
-    public PlainVM(Integer vmOs, Integer vmcpu, Integer vmram, Integer vmssd) {
-        super(vmOs, vmcpu, vmram);
+    public PlainVM(Integer vmType, Integer vmOs, Integer vmcpu, Integer vmram, Integer vmssd) {
+        super(vmType, vmOs, vmcpu, vmram);
         this.vmssd = vmssd;
     }
 

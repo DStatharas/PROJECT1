@@ -58,5 +58,8 @@ public class App
         //     System.out.println(
         //         "Three objects DO NOT point to the same memory location on the heap");
         // }
+
+        TestingClass lol = new TestingClass();
+        lol.someMethod(6);
     }
 }

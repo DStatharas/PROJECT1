@@ -6,7 +6,7 @@ public class ClusterResources {
 
     private static ClusterResources singleInstance = null;
 
-    public static ArrayList<VM> vmArray = new ArrayList<>();
+    private static ArrayList<VM> vmArray = new ArrayList<>();
 
     private Integer clcpu = 128;
     private Integer clram = 256;

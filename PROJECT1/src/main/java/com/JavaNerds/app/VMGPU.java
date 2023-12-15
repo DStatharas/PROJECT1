@@ -3,8 +3,8 @@ package com.JavaNerds.app;
 public class VmGPU extends PlainVM{
     protected Integer vmgpu;
 
-    public VmGPU (Integer vmOs, Integer vmcpu, Integer vmram, Integer vmssd, Integer vmgpu) {
-        super(vmOs, vmcpu, vmram, vmssd);
+    public VmGPU (Integer vmType, Integer vmOs, Integer vmcpu, Integer vmram, Integer vmssd, Integer vmgpu) {
+        super(vmType, vmOs, vmcpu, vmram, vmssd);
         this.vmgpu = vmgpu;
     }
     
