@@ -11,7 +11,7 @@ public class VmNetworkedGPU extends VmGPU{
     @Override
     public void printVmReport() {
         super.printVmReport();
-        System.out.println("VM Bandwidth: "+this.vmbandwidth+" Gb/sec");
+        System.out.println("Bandwidth: "+this.vmbandwidth+" Gb/sec");
     }
     
     public Integer getVmbandwidth() {

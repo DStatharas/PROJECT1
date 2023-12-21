@@ -1,0 +1,55 @@
+package com.JavaNerds.app;
+
+import java.io.IOException;
+
+public abstract class projectTools {
+
+    public static void clearConsole() {
+        try {
+            String os = System.getProperty("os.name").toLowerCase();
+
+            if (os.contains("win")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                new ProcessBuilder("clear").inheritIO().start().waitFor();
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void dotLoading(String indication, Integer iterations) throws InterruptedException  {
+        for (int i = 0; i < iterations; i++) {
+            clearConsole();
+            System.out.print(indication);
+            for (int j = 0; j < 3; j++) {
+                Thread.sleep(150);
+                System.out.print(".");
+                Thread.sleep(150);
+            }
+        }
+        clearConsole();
+    }
+
+    public static void propellerLoading(String indication, Integer rotations) throws InterruptedException {
+        for (int i = 0; i < rotations; i++) {
+            clearConsole();
+            System.out.print(indication+" ");
+            System.out.println("|");
+            Thread.sleep(150);
+            clearConsole();
+            System.out.print(indication+" ");
+            System.out.println("/");
+            Thread.sleep(150);
+            clearConsole();
+            System.out.print(indication+" ");
+            System.out.println("-");
+            Thread.sleep(150);
+            clearConsole();
+            System.out.print(indication+" ");
+            System.out.println("\\");
+            Thread.sleep(150);
+        }
+        clearConsole();
+    }
+}

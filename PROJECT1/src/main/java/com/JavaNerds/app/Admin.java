@@ -1,6 +1,5 @@
 package com.JavaNerds.app;
 
-import java.rmi.dgc.VMID;
 import java.util.Scanner;
 
 public class Admin{
@@ -9,6 +8,7 @@ public class Admin{
 
     Scanner oneScanner = new Scanner(System.in);
 
+    private Boolean exitCheck = false;
     private String inputChecker = null;
     private Integer userCpu = null;
     private Integer userRam = null;
@@ -18,12 +18,14 @@ public class Admin{
     private Integer userOs = null;
     private Integer tempVmId = null;
     
-    public void createVM() {
+    public void createVM() throws InterruptedException {
         Integer userVmType = null;
 
         while (true) {
             inputChecker = null;
             userVmType = null;
+            exitCheck = false;
+
             userCpu = null;
             userRam = null;
             userSsd = null;
@@ -31,7 +33,9 @@ public class Admin{
             userBandwidth = null;
             userOs = null;
 
-            System.out.println("Please select one of the following numbers to choose the type of Virtual Machine you would like to create, or type Q to cancel VM creation."+"\n"+"1: Plain VM"+"\n"+"2: GPU VM"+"3: Networked VM"+"\n"+"4: Networked GPU VM"+"\n"+"Q: Cancel"+"\n");
+            projectTools.clearConsole();
+
+            System.out.print("Please select one of the following numbers to choose the type of Virtual Machine you would like to create, or enter Q to cancel VM creation."+"\n\n"+"1: Plain VM"+"\n"+"2: GPU VM"+"\n"+"3: Networked VM"+"\n"+"4: Networked GPU VM"+"\n"+"Q: Cancel"+"\n\n"+"Select option: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
             if (inputChecker.equalsIgnoreCase("q")) {
@@ -40,7 +44,9 @@ public class Admin{
                 try {
                     userVmType = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
+                    projectTools.clearConsole();
                     System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
                     continue;
                 }
             }
@@ -49,48 +55,100 @@ public class Admin{
                 case 1:
                     //PlainVM
                     setUserOCRS();
-                    
+                    if (exitCheck == true) {
+                        continue;
+                    }
                     adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
                     adminCluster.setClram(adminCluster.getClram()-userRam);
                     adminCluster.setClssd(adminCluster.getClssd()-userSsd);
 
-                    ClusterResources.vmArray.add(new PlainVM(1, userOs, userCpu, userRam, userSsd));
-
-                    System.out.println("PlainVM created!");
+                    try {
+                        projectTools.propellerLoading("Creating VM...", 5);
+                        ClusterResources.vmArray.add(new PlainVM(1, userOs, userCpu, userRam, userSsd));
+                        System.out.println("VM created!");
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: VM could not be created!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
+                    
                     break;
 
                     
                 case 2:
                     //VmGPU
                     setUserOCRS();
+                    if (exitCheck == true) {
+                        continue;
+                    }
                     setUserGpu();
+                    if (exitCheck == true) {
+                        continue;
+                    }
 
                     adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
                     adminCluster.setClram(adminCluster.getClram()-userRam);
                     adminCluster.setClssd(adminCluster.getClssd()-userSsd);
-                    adminCluster.setClgpu(adminCluster.getClssd()-userGpu);
+                    adminCluster.setClgpu(adminCluster.getClgpu()-userGpu);
 
-                    ClusterResources.vmArray.add(new VmGPU(2, userOs, userCpu, userRam, userSsd, userGpu));
+                    try {
+                        projectTools.propellerLoading("Creating VM...", userVmType);
+                        ClusterResources.vmArray.add(new VmGPU(2, userOs, userCpu, userRam, userSsd, userGpu));
+                        System.out.println("VM created!");
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: VM could not be created!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
                     break;
 
                 case 3:
                     //VmNetworked
                     setUserOCRS();
+                    if (exitCheck == true) {
+                        continue;
+                    }
                     setUserBandwidth();
+                    if (exitCheck == true) {
+                        continue;
+                    }
 
                     adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
                     adminCluster.setClram(adminCluster.getClram()-userRam);
                     adminCluster.setClssd(adminCluster.getClssd()-userSsd);
                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()-userBandwidth);
 
-                    ClusterResources.vmArray.add(new VmNetworked(3, userOs, userCpu, userRam, userSsd, userBandwidth));
+                    try {
+                        projectTools.propellerLoading("Creating VM...", 5);
+                        ClusterResources.vmArray.add(new VmNetworked(3, userOs, userCpu, userRam, userSsd, userBandwidth));
+                        System.out.println("VM created!");
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: VM could not be created!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
                     break;
 
                 case 4:
                     //VmNetworkedGPU
                     setUserOCRS();
+                    if (exitCheck == true) {
+                        continue;
+                    }
                     setUserGpu();
+                    if (exitCheck == true) {
+                        continue;
+                    }
                     setUserBandwidth();
+                    if (exitCheck == true) {
+                        continue;
+                    }
 
                     adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
                     adminCluster.setClram(adminCluster.getClram()-userRam);
@@ -98,18 +156,30 @@ public class Admin{
                     adminCluster.setClgpu(adminCluster.getClssd()-userGpu);
                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()-userBandwidth);
 
-                    ClusterResources.vmArray.add(new VmNetworkedGPU(4, userOs, userCpu, userRam, userSsd, userGpu, userBandwidth));
+                    try {
+                        projectTools.propellerLoading("Creating VM...", 5);
+                        ClusterResources.vmArray.add(new VmNetworkedGPU(4, userOs, userCpu, userRam, userSsd, userGpu, userBandwidth));
+                        System.out.println("VM created!");
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: VM could not be created!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
                     break;
 
                 default:
                     //Invalid VM Type
-                    System.out.println("Please choose a valid type of Virtual Machine!");
+                    projectTools.clearConsole();
+                    System.out.println("ERROR: Please choose a valid type of Virtual Machine!");
+                    Thread.sleep(3000);
                     continue;
             }
         }
     }
     
-    private void updateResources() {
+    public void updateResources() throws InterruptedException {
         Integer resourceToUpdate = null;
 
         while (true) {
@@ -117,23 +187,17 @@ public class Admin{
             inputChecker = null;
             tempVmId = null;
             resourceToUpdate = null;
-            
-            // ClusterResources.vmArray.get(vmId-1).setVmcpu;
-
-            // if (ClusterResources.vmArray.get(vmId-1) instanceof VmGPU) {
-            //     VmGPU vmGpuInstance = (VmGPU) ClusterResources.vmArray.get(vmId-1);
-            //     vmGpuInstance.getVmgpu();
-            // }
-
-            //     VM instance = ClusterResources.vmArray.get(5);
-            //     instance = (VmGPU) instance;
                 
+            projectTools.clearConsole();
+
             //choosevmId
             while (true) {
                 inputChecker = null;
                 tempVmId = null;
 
-                System.out.println("Enter the ID of the VM you'd like to update or Q to cancel:");
+                projectTools.clearConsole();
+
+                System.out.print("Enter the ID of the VM you'd like to update or Q to cancel: ");
                 inputChecker = oneScanner.next();
                 oneScanner.nextLine();
 
@@ -144,27 +208,34 @@ public class Admin{
                     try {
                         tempVmId = Integer.parseInt(inputChecker);
                     } catch (Exception e) {
+                        projectTools.clearConsole();
                         System.out.println("ERROR: Invalid input!");
+                        Thread.sleep(3000);
                         continue;
                     }
                 }
-                if (tempVmId >= ClusterResources.vmArray.size() || tempVmId < 0) {
+                if (tempVmId > ClusterResources.vmArray.size() || tempVmId <= 0) {
+                    projectTools.clearConsole();
                     System.out.println("This VM ID does not exist!");
+                    Thread.sleep(3000);
                     continue;
                 }
                 else {
+                    projectTools.clearConsole();
                     System.out.println("Selected VM"+ClusterResources.vmArray.get(tempVmId-1).getVmid()+"!");
+                    Thread.sleep(3000);
                 }
 
                 break;
             }
 
             //chooseresource
-            
             while (true) {
                 resourceToUpdate = null;
 
-                System.out.println("Choose a resource to update:"+"\n"+"1: OS"+"\n"+"2: CPU"+"\n"+"3: RAM"+"\n"+"4: SSD"+"\n"+"5: GPU"+"\n"+"6: Bandwidth"+"\n"+"Q: Cancel");
+                projectTools.clearConsole();
+                System.out.print("Please select a resource to update:\n"+"\n"+"1: OS"+"\n"+"2: CPU"+"\n"+"3: RAM"+"\n"+"4: SSD"+"\n"+"5: GPU"+"\n"+"6: Bandwidth"+"\n"+"Q: Cancel\n\n");
+                System.out.print("Select option: ");
                 inputChecker = oneScanner.next();
                 oneScanner.nextLine();
                 if (inputChecker.equalsIgnoreCase("q")) {
@@ -174,7 +245,9 @@ public class Admin{
                     try {
                         resourceToUpdate = Integer.parseInt(inputChecker);
                     } catch (Exception e) {
+                        projectTools.clearConsole();
                         System.out.println("ERROR: Invalid input!");
+                        Thread.sleep(3000);
                         continue;
                     }
                 }
@@ -186,7 +259,9 @@ public class Admin{
                             inputChecker = null;
                             userOs = null;
                             
-                            System.out.println("Choose an OS to assign:"+"\n"+"1: Windows"+"\n"+"2: Ubuntu"+"\n"+"3: Fedora"+"\n"+"Q: Cancel");
+                            projectTools.clearConsole();
+
+                            System.out.print("Please select an OS:"+"\n"+"1: Windows"+"\n"+"2: Ubuntu"+"\n"+"3: Fedora"+"\n"+"Q: Cancel\n\n"+"Select option: ");
                             inputChecker = oneScanner.next();
                             oneScanner.nextLine();
                             if (inputChecker.equalsIgnoreCase("q")) {
@@ -197,17 +272,31 @@ public class Admin{
                                     userOs = Integer.parseInt(inputChecker);
                                     userOs -= 1;
                                 } catch (Exception e) {
+                                    projectTools.clearConsole();
                                     System.out.println("ERROR: Invalid input!");
+                                    Thread.sleep(3000);
                                     continue;
                                 }
                             }
-                            if (userOs != 0 || userOs != 1 || userOs != 2) {
+                            if (userOs != 0 && userOs != 1 && userOs != 2) {
+                                projectTools.clearConsole();
                                 System.out.println("Please select a valid OS!");
+                                Thread.sleep(3000);
                                 continue;
                             }
                             
-                            ClusterResources.vmArray.get(tempVmId-1).setVmOs(userOs);
-
+                            try {
+                                projectTools.dotLoading("Updating VM with the chosen specifications...", 5);
+                                ClusterResources.vmArray.get(tempVmId-1).setVmOs(userOs);
+                                System.out.println("VM updated!");
+                                Thread.sleep(3000);
+                            } catch (Exception e) {
+                                projectTools.clearConsole();
+                                System.out.println("Could not update VM!");
+                                Thread.sleep(3000);
+                                continue;
+                            }
+                            
                             break;
                         }
                     
@@ -217,7 +306,9 @@ public class Admin{
                             inputChecker = null;
                             userCpu = null;
 
-                            System.out.println("Enter number of CPU cores to assign or Q to cancel:");
+                            projectTools.clearConsole();
+
+                            System.out.print("Enter number of CPU cores to assign or Q to cancel: ");
                             inputChecker = oneScanner.next();
                             oneScanner.nextLine();
 
@@ -228,21 +319,49 @@ public class Admin{
                                 try {
                                     userCpu = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
+                                    projectTools.clearConsole();
                                     System.out.println("ERROR: Invalid input!");
+                                    Thread.sleep(3000);
                                     continue;
                                 }
                             }
                             if (userCpu <= 0) {
+                                projectTools.clearConsole();
                                 System.out.println("CPU cores are required!");
+                                Thread.sleep(3000);
                                 continue;
                             }
                             else if ((ClusterResources.vmArray.get(tempVmId).getVmcpu()-userCpu)+adminCluster.getClcpu() < 0) {
-                                System.out.println("Not enough CPU cores available on the cluster!");
+                                projectTools.clearConsole();
+                                System.out.println("Not enough resources available on the cluster!");
+                                Thread.sleep(3000);
                                 continue;
                             }
 
-                            adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
-                            ClusterResources.vmArray.get(tempVmId-1).setVmcpu(userCpu);
+                            try {
+                                projectTools.propellerLoading("Updating Cluster...", 5);
+                                adminCluster.setClcpu(adminCluster.getClcpu()+(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmcpu()-userCpu));
+                                System.out.println("Cluster updated!");
+                                Thread.sleep(3000);
+                            } catch (Exception e) {
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update Cluster!");
+                                Thread.sleep(3000);
+                                continue;
+                            }
+
+                            try {
+                                projectTools.propellerLoading("Updating VM with the assigned specifications....", 5);
+                                ((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).setVmcpu(userCpu);
+                                System.out.println("VM updated!");
+                                Thread.sleep(3000);
+                            } catch (Exception e) {
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update VM!");
+                                Thread.sleep(3000);
+                                adminCluster.setClcpu(adminCluster.getClcpu()-(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmcpu()-userCpu));
+                                continue;
+                            }
 
                             break;
                         }
@@ -252,8 +371,11 @@ public class Admin{
                         inputChecker = null;
                         userRam = null;
 
+                        projectTools.clearConsole();
+
                         while (true) {
-                            System.out.println("Enter number of GB of RAM to assign or Q to cancel:");
+                            projectTools.clearConsole();
+                            System.out.print("Enter number of GB of RAM to assign or Q to cancel: ");
                             inputChecker = oneScanner.next();
                             oneScanner.nextLine();
 
@@ -264,21 +386,49 @@ public class Admin{
                                 try {
                                     userRam = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
+                                    projectTools.clearConsole();
                                     System.out.println("ERROR: Invalid input!");
+                                    Thread.sleep(3000);
                                     continue;
                                 }
                             }
                             if (userRam <= 0) {
+                                projectTools.clearConsole();
                                 System.out.println("RAM is required!");
+                                Thread.sleep(3000);
                                 continue;
                             }
                             else if ((ClusterResources.vmArray.get(tempVmId-1).getVmram()-userCpu)+adminCluster.getClram() < 0) {
+                                projectTools.clearConsole();
                                 System.out.println("Not enough resources available on the cluster!");
+                                Thread.sleep(3000);
                                 continue;
                             }
 
-                            adminCluster.setClram(adminCluster.getClram()-userRam);
-                            ClusterResources.vmArray.get(tempVmId-1).setVmram(userRam);
+                            try {
+                                projectTools.propellerLoading("Updating Cluster...", 5);
+                                adminCluster.setClram(adminCluster.getClram()+(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmram()-userRam));
+                                System.out.println("Cluster updated!");
+                                Thread.sleep(3000);
+                            } catch (Exception e) {
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update Cluster!");
+                                Thread.sleep(3000);
+                                continue;
+                            }
+
+                            try {
+                                projectTools.propellerLoading("Updating VM with the assigned specifications...", resourceToUpdate);
+                                ((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).setVmram(userRam);
+                                System.out.println("VM updated!");
+                                Thread.sleep(3000);
+                            } catch (Exception e) {
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update VM!");
+                                Thread.sleep(3000);
+                                adminCluster.setClram(adminCluster.getClram()-(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmram()-userRam));
+                                continue;
+                            }
 
                             break;
                         }
@@ -288,13 +438,18 @@ public class Admin{
                         inputChecker = null;
                         userSsd = null;
 
+                        projectTools.clearConsole();
+
                         if (ClusterResources.vmArray.get(tempVmId-1) instanceof PlainVM == false) {
+                            projectTools.clearConsole();
                             System.out.println("This type of resource is not available to this VM!");
+                            Thread.sleep(3000);
                             continue;
                         }
                         
                         while (true) {
-                            System.out.println("Enter number of GB of SSD storage to assign or Q to cancel:");
+                            projectTools.clearConsole();
+                            System.out.print("Enter number of GB of SSD storage to assign or Q to cancel: ");
                             inputChecker = oneScanner.next();
                             oneScanner.nextLine();
 
@@ -305,25 +460,49 @@ public class Admin{
                                 try {
                                     userSsd = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
+                                    projectTools.clearConsole();
                                     System.out.println("ERROR: Invalid input!");
+                                    Thread.sleep(3000);
                                     continue;
                                 }
                             }
                             if (userSsd <= 0) {
+                                projectTools.clearConsole();
                                 System.out.println("SSD storage is required!");
+                                Thread.sleep(3000);
                                 continue;
                             }
                             else if ((((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()-userSsd)+adminCluster.getClssd() < 0) {
+                                projectTools.clearConsole();
                                 System.out.println("Not enough resources available on the cluster!");
+                                Thread.sleep(3000);
                                 continue;
                             }
 
-                            adminCluster.setClssd(adminCluster.getClssd()-userSsd);
+                            try {
+                                projectTools.propellerLoading("Updating Cluster...", 5);
+                                adminCluster.setClssd(adminCluster.getClssd()+(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()-userSsd));
+                                System.out.println("Cluster updated!");
+                                Thread.sleep(3000);
+                            } catch (Exception e) {
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update Cluster!");
+                                Thread.sleep(3000);
+                                continue;
+                            }
+                            
+                            
                             
                             try {
+                                projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
                                 ((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).setVmssd(userSsd);
+                                System.out.println("VM updated!");
+                                Thread.sleep(3000);
                             } catch (Exception e) {
-                                System.out.println("Could not cast to PlainVM!");
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update VM!");
+                                Thread.sleep(3000);
+                                adminCluster.setClssd(adminCluster.getClssd()-(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()-userSsd));
                                 continue;
                             }
 
@@ -334,14 +513,19 @@ public class Admin{
                         inputChecker = null;
                         userGpu = null;
 
+                        projectTools.clearConsole();
+
                         //GPU
                         if (ClusterResources.vmArray.get(tempVmId-1) instanceof VmGPU == false) {
+                            projectTools.clearConsole();
                             System.out.println("This type of resource is not available to this VM!");
+                            Thread.sleep(3000);
                             continue;
                         }
                         
                         while (true) {
-                            System.out.println("Enter number of GPUs to assign or Q to cancel:");
+                            projectTools.clearConsole();
+                            System.out.print("Enter number of GPUs to assign or Q to cancel: ");
                             inputChecker = oneScanner.next();
                             oneScanner.nextLine();
 
@@ -352,25 +536,47 @@ public class Admin{
                                 try {
                                     userGpu = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
+                                    projectTools.clearConsole();
                                     System.out.println("ERROR: Invalid input!");
+                                    Thread.sleep(3000);
                                     continue;
                                 }
                             }
                             if (userGpu <= 0) {
+                                projectTools.clearConsole();
                                 System.out.println("GPUs are required!");
+                                Thread.sleep(3000);
                                 continue;
                             }
                             else if ((((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()-userGpu)+adminCluster.getClgpu() < 0) {
+                                projectTools.clearConsole();
                                 System.out.println("Not enough resources available on the cluster!");
+                                Thread.sleep(3000);
                                 continue;
                             }
 
-                            adminCluster.setClgpu(adminCluster.getClgpu()-userGpu);
                             
                             try {
-                                ((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).setVmgpu(userGpu);
+                                projectTools.propellerLoading("Updating Cluster...", 5);
+                                adminCluster.setClgpu(adminCluster.getClgpu()+(((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()-userGpu));
+                                System.out.println("Cluster Updated!");
+                                Thread.sleep(3000);
                             } catch (Exception e) {
-                                System.out.println("Could not cast to VMGpu!");
+                                System.out.println("ERROR: Could not update Cluster!");
+                                Thread.sleep(3000);
+                                continue;
+                            }
+
+                            try {
+                                projectTools.propellerLoading("Updating VM with the assigned specifications... ", 5);
+                                ((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).setVmgpu(userGpu);
+                                System.out.println("VM Updated!");
+                                Thread.sleep(3000);
+                            } catch (Exception e) {
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update VM!");
+                                Thread.sleep(3000);
+                                adminCluster.setClgpu(adminCluster.getClgpu()-(((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()-userGpu));
                                 continue;
                             }
 
@@ -381,14 +587,19 @@ public class Admin{
                         inputChecker = null;
                         userBandwidth = null;
 
+                        projectTools.clearConsole();
+
                         //BANDWIDTH
                         if (ClusterResources.vmArray.get(tempVmId-1) instanceof VmNetworked == false && ClusterResources.vmArray.get(tempVmId-1) instanceof VmNetworkedGPU == false) {
+                            projectTools.clearConsole();
                             System.out.println("This type of resource is not available to this VM!");
+                            Thread.sleep(3000);
                             continue;
                         }
                         
                         while (true) {
-                            System.out.println("Enter number of GB of Bandwidth rate to assign or Q to cancel:");
+                            projectTools.clearConsole();
+                            System.out.print("Enter number of GB of Bandwidth rate to assign or Q to cancel: ");
                             inputChecker = oneScanner.next();
                             oneScanner.nextLine();
 
@@ -399,25 +610,47 @@ public class Admin{
                                 try {
                                     userBandwidth = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
+                                    projectTools.clearConsole();
                                     System.out.println("ERROR: Invalid input!");
+                                    Thread.sleep(3000);
                                     continue;
                                 }
                             }
                             if (userBandwidth <= 0) {
+                                projectTools.clearConsole();
                                 System.out.println("Bandwidth is required in this VM!");
+                                Thread.sleep(3000);
                                 continue;
                             }
                             else if ((((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()-userBandwidth)+adminCluster.getClbandwidth() < 0) {
+                                projectTools.clearConsole();
                                 System.out.println("Not enough resources available on the cluster!");
+                                Thread.sleep(3000);
                                 continue;
                             }
 
-                            adminCluster.setClbandwidth(adminCluster.getClbandwidth()-userBandwidth);
-                            
                             try {
-                                ((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).setVmbandwidth(userBandwidth);
+                                projectTools.propellerLoading("Updating Cluster...", 5);
+                                adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()-userBandwidth));
+                                System.out.println("Cluster Updated!");
+                                Thread.sleep(3000);
                             } catch (Exception e) {
-                                System.out.println("Could not cast to VmNetworked!");
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update Cluster!");
+                                Thread.sleep(3000);
+                                continue;
+                            }
+
+                            try {
+                                projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
+                                ((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).setVmbandwidth(userBandwidth);
+                                System.out.println("VM Updated!");
+                                Thread.sleep(3000);
+                            } catch (Exception e) {
+                                projectTools.clearConsole();
+                                System.out.println("ERROR: Could not update VM!");
+                                Thread.sleep(3000);
+                                adminCluster.setClbandwidth(adminCluster.getClbandwidth()-(((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()-userBandwidth));
                                 continue;
                             }
 
@@ -425,7 +658,9 @@ public class Admin{
                         }
                     
                     default:
-                        System.out.println("Please select a valid option!");
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: Please select a valid option!");
+                        Thread.sleep(3000);
                         continue;
                 }
             }
@@ -433,14 +668,15 @@ public class Admin{
         }
     }
 
-    public void deleteVm(){
-        //method should return resources to cluster
+    public void deleteVm() throws InterruptedException{
         String inputChecker = null;
 
         while (true) {
             inputChecker = null;
             tempVmId = null;
-            System.out.println("Enter the ID of the VM you want to delete or Q to cancel:");
+
+            projectTools.clearConsole();
+            System.out.print("Enter the ID of the VM you want to delete or Q to cancel: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
 
@@ -451,7 +687,9 @@ public class Admin{
                 try {
                     tempVmId = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
+                    projectTools.clearConsole();
                     System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
                     continue;
                 }
             }
@@ -461,7 +699,10 @@ public class Admin{
                     adminCluster.setClcpu(adminCluster.getClcpu()+(ClusterResources.vmArray.get(tempVmId-1).getVmcpu()));
                     adminCluster.setClram(adminCluster.getClram()+(ClusterResources.vmArray.get(tempVmId-1).getVmram()));
                     adminCluster.setClssd(adminCluster.getClssd()+(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()));
+
+                    projectTools.propellerLoading("Updating Cluster...", 5);
                     System.out.println("Cluster updated!");
+                    Thread.sleep(3000);
                     break;
 
                 case "VmGPU":
@@ -469,7 +710,10 @@ public class Admin{
                     adminCluster.setClram(adminCluster.getClram()+(ClusterResources.vmArray.get(tempVmId-1).getVmram()));
                     adminCluster.setClssd(adminCluster.getClssd()+(((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()));
                     adminCluster.setClgpu(adminCluster.getClgpu()+(((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()));
+
+                    projectTools.propellerLoading("Updating Cluster...", 5);
                     System.out.println("Cluster updated!");
+                    Thread.sleep(3000);
                     break;
 
                 case "VmNetworked":
@@ -477,7 +721,10 @@ public class Admin{
                     adminCluster.setClram(adminCluster.getClram()+(ClusterResources.vmArray.get(tempVmId-1).getVmram()));
                     adminCluster.setClssd(adminCluster.getClssd()+(((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()));
                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()));
+
+                    projectTools.propellerLoading("Updating Cluster...", 5);
                     System.out.println("Cluster updated!");
+                    Thread.sleep(3000);
                     break;
 
                 case "VmNetworkedGPU":
@@ -486,42 +733,61 @@ public class Admin{
                     adminCluster.setClssd(adminCluster.getClssd()+(((VmNetworkedGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()));
                     adminCluster.setClgpu(adminCluster.getClgpu()+(((VmNetworkedGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()));
                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworkedGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()));
+
+                    projectTools.propellerLoading("Updating Cluster...", 5);
                     System.out.println("Cluster updated!");
+                    Thread.sleep(3000);
                     break;
 
                 default:
                     System.out.println("VM Type not recognized!");
+                    Thread.sleep(3000);
                     continue;
             }
 
             try {
                 ClusterResources.vmArray.remove(tempVmId-1);
+                projectTools.propellerLoading("Deleting VM...", 5);
                 System.out.println("VM deleted!");
+                Thread.sleep(3000);
             } catch (Exception e) {
+                projectTools.clearConsole();
                 System.out.println("This VM id does not exist!");
+                Thread.sleep(3000);
                 continue;
             }
             break;
         }
     }
 
-    public void setUserOCRS() {
-        setUserOS();
-        setUserCPU();
-        setUserRAM();
-        setUserSSD();
+    public void setUserOCRS() throws InterruptedException {
+        if (exitCheck == false) {
+            setUserOS();
+        }
+        if (exitCheck == false) {
+            setUserCPU();
+        }
+        if (exitCheck == false) {
+            setUserRAM();
+        }
+        if (exitCheck == false) {
+            setUserSSD();
+        }
     }
 
-    public void setUserOS() {
+    public void setUserOS() throws InterruptedException {
         //OS
         while (true) {
             inputChecker = null;
             userOs = null;
-            
-            System.out.println("Choose an OS:"+"\n"+"1: Windows"+"\n"+"2: Ubuntu"+"\n"+"3: Fedora"+"\n"+"Q: Cancel"+"\n");
+            exitCheck = false;
+
+            projectTools.clearConsole();
+            System.out.print("Please select an OS:"+"\n\n"+"1: Windows"+"\n"+"2: Ubuntu"+"\n"+"3: Fedora"+"\n"+"Q: Cancel\n"+"\n"+"Select option: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
             if (inputChecker.equalsIgnoreCase("q")) {
+                exitCheck = true;
                 break;
             }
             else {
@@ -529,12 +795,16 @@ public class Admin{
                     userOs = Integer.parseInt(inputChecker);
                     userOs -= 1;
                 } catch (Exception e) {
+                    projectTools.clearConsole();
                     System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
                     continue;
                 }
             }
-            if (userOs != 0 || userOs != 1 || userOs != 2) {
-                System.out.println("Please select a valid OS!");
+            if (userOs != 0 && userOs != 1 && userOs != 2) {
+                projectTools.clearConsole();
+                System.out.println("ERROR: Please select a valid OS!");
+                Thread.sleep(3000);
                 continue;
             }
 
@@ -542,34 +812,43 @@ public class Admin{
         }
     }
 
-    public void setUserCPU() {
+    public void setUserCPU() throws InterruptedException {
         //CPU
         while (true) {
             inputChecker = null;
             userCpu = null;
+            exitCheck = false;
 
-            System.out.println("Enter number of CPU cores to assign or Q to cancel: ");
+            projectTools.clearConsole();
+            System.out.print("Enter number of CPU cores to assign or Q to cancel: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
 
             if (inputChecker.equalsIgnoreCase("q")) {
+                exitCheck = true;
                 break;
             }
             else {
                 try {
                     userCpu = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
+                    projectTools.clearConsole();
                     System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
                     continue;
                 }
             }
             if (userCpu <= 0) {
-                System.out.println("CPU cores are required!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: CPU cores are required!");
+                Thread.sleep(3000);
                 continue;
             }
             //(vmRes-resInput)+clRes>=clRes
             else if (userCpu > adminCluster.getClcpu()) {
-                System.out.println("Not enough resources available on the cluster!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: Not enough resources available on the cluster!");
+                Thread.sleep(3000);
                 continue;
             }
 
@@ -577,33 +856,42 @@ public class Admin{
         }
     }
 
-    public void setUserRAM() {
+    public void setUserRAM() throws InterruptedException {
         //RAM
         while (true) {
             inputChecker = null;
             userRam = null;
+            exitCheck = false;
         
-            System.out.println("Enter number of GB of RAM to assign or Q to cancel:");
+            projectTools.clearConsole();
+            System.out.print("Enter number of GB of RAM to assign or Q to cancel: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
 
             if (inputChecker.equalsIgnoreCase("q")) {
+                exitCheck = true;
                 break;
             }
             else {
                 try {
                     userRam = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
+                    projectTools.clearConsole();
                     System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
                     continue;
                 }
             }
             if (userRam <= 0) {
-                System.out.println("RAM is required!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: RAM is required!");
+                Thread.sleep(3000);
                 continue;
             }
             else if (userRam > adminCluster.getClram()) {
-                System.out.println("Not enough resources available on the cluster!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: Not enough resources available on the cluster!");
+                Thread.sleep(3000);
                 continue;
             }
 
@@ -611,33 +899,42 @@ public class Admin{
         }
     }
 
-    public void setUserSSD() {
+    public void setUserSSD() throws InterruptedException {
         //SSD
         while (true) {
             inputChecker = null;
             userSsd = null;
+            exitCheck = false;
 
-            System.out.println("Enter number of GB of SSD storage to assign or Q to cancel:");
+            projectTools.clearConsole();
+            System.out.print("Enter number of GB of SSD storage to assign or Q to cancel: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
 
             if (inputChecker.equalsIgnoreCase("q")) {
+                exitCheck = true;
                 break;
             }
             else {
                 try {
                     userSsd = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
+                    projectTools.clearConsole();
                     System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
                     continue;
                 }
             }
             if (userSsd <= 0) {
-                System.out.println("SSD storage can't be 0 or less in this VM!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: SSD storage is required!");
+                Thread.sleep(3000);
                 continue;
             }
             else if (userSsd > adminCluster.getClssd()) {
-                System.out.println("Not enough resources available on the cluster!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: Not enough resources available on the cluster!");
+                Thread.sleep(3000);
                 continue;
             }
 
@@ -645,33 +942,42 @@ public class Admin{
         }
     }
 
-    private void setUserGpu() {
+    private void setUserGpu() throws InterruptedException {
         //GPU
         while (true) {
             inputChecker = null;
             userGpu = null;
+            exitCheck = false;
 
-            System.out.println("Enter number of GPUs to assign or Q to cancel:");
+            projectTools.clearConsole();
+            System.out.print("Enter number of GPUs to assign or Q to cancel: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
 
             if (inputChecker.equalsIgnoreCase("q")) {
+                exitCheck = true;
                 break;
             }
             else {
                 try {
                     userGpu = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
+                    projectTools.clearConsole();
                     System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
                     continue;
                 }
             }
             if (userGpu <= 0) {
-                System.out.println("GPUs can't be 0 or less in this VM!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: GPUs are required!");
+                Thread.sleep(3000);
                 continue;
             }
             else if (userGpu > adminCluster.getClgpu()) {
-                System.out.println("Not enough resources available on the cluster!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: Not enough resources available on the cluster!");
+                Thread.sleep(3000);
                 continue;
             }
 
@@ -679,33 +985,42 @@ public class Admin{
         }
     }
 
-    private void setUserBandwidth() {
+    private void setUserBandwidth() throws InterruptedException {
         //Bandwidth
         while (true) {
             inputChecker = null;
             userBandwidth = null;
+            exitCheck = false;
 
-            System.out.println("Enter the amount of bandwidth rate to assign or Q to cancel:");
+            projectTools.clearConsole();
+            System.out.print("Enter the amount of bandwidth rate to assign or Q to cancel: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
 
             if (inputChecker.equalsIgnoreCase("q")) {
+                exitCheck = true;
                 break;
             }
             else {
                 try {
                     userBandwidth = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
+                    projectTools.clearConsole();
                     System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
                     continue;
                 }
             }
             if (userBandwidth <= 0) {
-                System.out.println("Bandwidth is required in this VM!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: Bandwidth is required!");
+                Thread.sleep(3000);
                 continue;
             }
             else if (userBandwidth > adminCluster.getClgpu()) {
-                System.out.println("Not enough resources available on the cluster!");
+                projectTools.clearConsole();
+                System.out.println("ERROR: Not enough resources available on the cluster!");
+                Thread.sleep(3000);
                 continue;
             }
 
@@ -713,13 +1028,15 @@ public class Admin{
         }
     }
 
-    public void printClusterReport() {
-        System.out.println("Cluster Report:"+"\n"+
-        "Cluster CPU Cores: "+adminCluster.getClcpu()+"\n"+
-        "Cluster RAM: "+adminCluster.getClram()+" GB"+"\n"+
-        "Cluster SSD: "+adminCluster.getClssd()+" GB"+"\n"+
-        "Cluster GPUs: "+adminCluster.getClgpu()+"\n"+
-        "Cluster Bandwidth: "+adminCluster.getClbandwidth()+" Gb/sec");
+    public String reportCluster() {
+        String report = "------- ~Cluster~ -------"+"\n"+
+        " CPU Cores: "+adminCluster.getClcpu()+"\n"+
+        " RAM: "+adminCluster.getClram()+" GB"+"\n"+
+        " SSD: "+adminCluster.getClssd()+" GB"+"\n"+
+        " GPUs: "+adminCluster.getClgpu()+"\n"+
+        " Bandwidth: "+adminCluster.getClbandwidth()+" Gb/sec\n"+
+        "-------------------------\n";
+        return report;
     }
 
     public VM findVmById(Integer vmId) {
@@ -729,5 +1046,108 @@ public class Admin{
             }
         }
         return null;
+    }
+
+    public void reportVm() throws InterruptedException {
+        while (true) {
+                inputChecker = null;
+                tempVmId = null;
+
+                projectTools.clearConsole();
+                System.out.print("Enter the ID of the VM you'd like to report, enter A to report all VMs or Q to cancel: ");
+                inputChecker = oneScanner.next();
+                oneScanner.nextLine();
+
+                if (inputChecker.equalsIgnoreCase("a")) {
+                    projectTools.clearConsole();
+                    System.out.println("-----------------\n Total VM Report\n-----------------\n\n");
+                    for (VM element : ClusterResources.vmArray) {
+                        try {
+                            element.printVmReport();
+                            System.out.println("---------------");
+                            System.out.println("\n");
+                        } catch (Exception e) {
+                            System.out.println("ERROR: Cannot print VM(s)!");
+                            Thread.sleep(3000);
+                            break;
+                        }
+                    }
+                    
+                    System.out.print("Press Enter to continue...");
+                    oneScanner.nextLine();
+                    continue;
+                }
+                else if (inputChecker.equalsIgnoreCase("q")) {
+                    break;
+                }
+                else {
+                    try {
+                        tempVmId = Integer.parseInt(inputChecker);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: Invalid input!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
+                }
+                if (tempVmId > ClusterResources.vmArray.size() || tempVmId <= 0) {
+                    projectTools.clearConsole();
+                    System.out.println("This VM ID does not exist!");
+                    Thread.sleep(3000);
+                    continue;
+                }
+                else {
+                    switch (ClusterResources.vmArray.get(tempVmId-1).getVmType()) {
+                        case "PlainVM":
+                            projectTools.clearConsole();
+                            ((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).printVmReport();
+                            System.out.println("---------------");
+                            System.out.print("\nPress Enter to continue...\n");
+                            oneScanner.nextLine();
+                            continue;
+                        
+                        case "VmGPU":
+                            projectTools.clearConsole();
+                            ((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).printVmReport();
+                            System.out.println("---------------");
+                            System.out.print("\nPress Enter to continue...\n");
+                            oneScanner.nextLine();
+                            continue;
+
+                        case "VmNetworked":
+                            projectTools.clearConsole();
+                            ((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).printVmReport();
+                            System.out.println("---------------");
+                            System.out.print("\nPress Enter to continue...\n");
+                            oneScanner.nextLine();
+                            continue;
+
+                        case "VmNetworkedGPU":
+                            projectTools.clearConsole();
+                            ((VmNetworkedGPU) ClusterResources.vmArray.get(tempVmId-1)).printVmReport();
+                            System.out.println("---------------\n");
+                            System.out.print("\nPress Enter to continue...");
+                            oneScanner.nextLine();
+                            continue;
+
+                        default:
+                            projectTools.clearConsole();
+                            System.out.println("Invalid VM type!");
+                            Thread.sleep(3000);
+                            continue;
+                    }
+                }
+            }
+    }
+
+    public void displayVmArray() {
+        System.out.println("-- ~Currently active Virtual Machines~ --");
+        if (ClusterResources.vmArray.isEmpty()) {
+            System.out.print(" No Virtual Machines have been created! ");
+        }else{ 
+            for (VM element : ClusterResources.vmArray) {
+                System.out.print(" |VM"+element.getVmid()+"| ");
+            }
+        }
     }
 }

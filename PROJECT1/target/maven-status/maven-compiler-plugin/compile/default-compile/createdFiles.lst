@@ -1,0 +1,7 @@
+com\JavaNerds\app\PlainVM.class
+com\JavaNerds\app\ClusterResources.class
+com\JavaNerds\app\VmGPU.class
+com\JavaNerds\app\VM.class
+com\JavaNerds\app\VmNetworked.class
+com\JavaNerds\app\VmNetworkedGPU.class
+com\JavaNerds\app\TestingClass.class

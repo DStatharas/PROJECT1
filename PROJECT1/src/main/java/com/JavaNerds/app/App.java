@@ -1,65 +1,78 @@
 package com.JavaNerds.app;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class App
+
 {
-    public static void main( String[] args )
-    {
-        ArrayList<Integer> n = new ArrayList<>();
-        // n.add(1);
-        // n.add(1);
-        // n.add(1);
-        // n.add(1);
-        // n.remove(3);
-        // Integer x = null;
-        // while (true) {
-        //     Scanner myScanner = new Scanner(System.in);
-        //     Integer i;
-        //     Integer g;
-        //     Integer d;
-        //     try {
-        //         System.out.println("Input");
-        //         i = myScanner.nextInt();
-        //         myScanner.nextLine();
-        //         g = myScanner.nextInt();
-        //         myScanner.nextLine();
-        //         d = myScanner.nextInt();
-        //         myScanner.nextLine();
-        //     } catch (Exception e) {
-        //         System.out.println("ERROR: Invalid input!");
-        //         myScanner.nextLine();
-        //         continue;
-        //     }
-        //     System.out.println("othercode");
-        //}
+    public static void main( String[] args ) throws InterruptedException
+    {   
+        Admin mainAdminInstance = new Admin();
 
-        // try {
-        //     System.out.println(x);
-        //     System.out.println("success"+x);
-        // } catch (Exception e) {
-        //     System.out.println("fail"+x);
-        // }
+        String inputChecker = null;
+        Integer intChecker = null;
+        Scanner oneScanner = new Scanner(System.in);
 
-        // ClusterResources j = ClusterResources.getInstance();
-        // ClusterResources k = ClusterResources.getInstance();
-        // ClusterResources l = ClusterResources.getInstance();
+        mloop:
+        while (true) {
+            inputChecker = null;
+            intChecker = null;
+            projectTools.clearConsole();
+            System.out.println("Welcome to Virtual Manager 2024: Cluster Boogaloo!\n");
+            System.out.println(mainAdminInstance.reportCluster());
+            mainAdminInstance.displayVmArray();
+            System.out.println("\n-----------------------------------------"+"\n\n");
+            System.out.println("Please select one of the following options:\n");
+            System.out.println("1: Create new Virtual Machine\n2: Update an existing Virtual Machine\n3: Delete a Virtual Machine\n4: Receive a report on a Virtual Machine's available resources\n0: Terminate Application\n");
+            System.out.print("Select option: ");
+            try {
+                intChecker = Integer.parseInt(oneScanner.next());
+                projectTools.clearConsole();
+            } catch (Exception e) {
+                System.out.println("Invalid input!");
+                Thread.sleep(3000);
+                continue;
+            }
+                
 
-        // if (j == k && k == l) {
- 
-        //     // Print statement
-        //     System.out.println(
-        //         "Three objects point to the same memory location on the heap i.e, to the same object");
-        // }
- 
-        // else {
-        //     // Print statement
-        //     System.out.println(
-        //         "Three objects DO NOT point to the same memory location on the heap");
-        // }
+            switch (intChecker) {
+                case 0:
+                    inputChecker = null;
+                    System.out.print("Are you sure you want to quit? All unsaved changes will be lost!\nY/N: ");
+                    try {
+                        inputChecker = oneScanner.next();
+                        oneScanner.nextLine();
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    if (inputChecker.equalsIgnoreCase("y")) {
+                        projectTools.propellerLoading("\n\n   Terminating Application..." , 10);
+                        break mloop;
+                    }
+                    else {
+                        continue;
+                    }
+                
+                case 1:
+                    mainAdminInstance.createVM();
+                    break;
 
-        TestingClass lol = new TestingClass();
-        lol.someMethod(6);
+                case 2:
+                    mainAdminInstance.updateResources();
+                    break;
+                    
+                case 3:
+                    mainAdminInstance.deleteVm();
+                    break;
+                    
+                case 4:
+                    mainAdminInstance.reportVm();
+                    break;
+                    
+                default:
+                    System.out.println("Please select a valid option!");
+                    continue;
+            }
+        }
     }
 }

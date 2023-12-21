@@ -23,7 +23,7 @@ abstract class VM{
     }
 
     public void printVmReport() {
-        System.out.println("VM"+this.vmid+"Report:"+"\n"+
+        System.out.println("--- ~|VM"+this.vmid+"|~ ---"+"\n"+
         "VM Type: "+this.vmType+"\n"+
         "OS: "+this.vmOs+"\n"+
         "CPU Cores: "+this.vmcpu+"\n"+
@@ -34,7 +34,6 @@ abstract class VM{
     public String getVmType() {
         return vmType;
     }
-
     public void setVmType(Integer vmType) {
         this.vmType = vmTypeArray[vmType];
     }

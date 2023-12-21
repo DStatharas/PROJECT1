@@ -3,6 +3,7 @@ package com.JavaNerds.app;
 public class TestingClass {
     String kek = "kek";
 
+    
     public void someMethod(Integer lol) {
         switch (lol) {
             case 1:
