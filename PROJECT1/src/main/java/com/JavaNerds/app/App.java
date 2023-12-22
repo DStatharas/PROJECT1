@@ -18,6 +18,7 @@ public class App
             inputChecker = null;
             intChecker = null;
             projectTools.clearConsole();
+            System.out.println("\u001B[32m" + "\n========== All parametric data files updated successfully ==========" + "\u001B[0m" + "\n");
             System.out.println("Welcome to Virtual Manager 2024: Cluster Boogaloo!\n");
             System.out.println(mainAdminInstance.reportCluster());
             mainAdminInstance.displayVmArray();
@@ -70,7 +71,8 @@ public class App
                     break;
                     
                 default:
-                    System.out.println("Please select a valid option!");
+                    projectTools.clearConsole();
+                    System.out.println();
                     continue;
             }
         }

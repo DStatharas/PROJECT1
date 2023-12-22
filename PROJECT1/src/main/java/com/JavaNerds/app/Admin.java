@@ -94,7 +94,7 @@ public class Admin{
                     adminCluster.setClgpu(adminCluster.getClgpu()-userGpu);
 
                     try {
-                        projectTools.propellerLoading("Creating VM...", userVmType);
+                        projectTools.propellerLoading("Creating VM...", 5);
                         ClusterResources.vmArray.add(new VmGPU(2, userOs, userCpu, userRam, userSsd, userGpu));
                         System.out.println("VM created!");
                         Thread.sleep(3000);
@@ -153,7 +153,7 @@ public class Admin{
                     adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
                     adminCluster.setClram(adminCluster.getClram()-userRam);
                     adminCluster.setClssd(adminCluster.getClssd()-userSsd);
-                    adminCluster.setClgpu(adminCluster.getClssd()-userGpu);
+                    adminCluster.setClgpu(adminCluster.getClgpu()-userGpu);
                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()-userBandwidth);
 
                     try {
@@ -182,6 +182,7 @@ public class Admin{
     public void updateResources() throws InterruptedException {
         Integer resourceToUpdate = null;
 
+        uloop:
         while (true) {
                 
             inputChecker = null;
@@ -202,7 +203,7 @@ public class Admin{
                 oneScanner.nextLine();
 
                 if (inputChecker.equalsIgnoreCase("q")) {
-                    break;
+                    break uloop;
                 }
                 else {
                     try {
@@ -214,7 +215,7 @@ public class Admin{
                         continue;
                     }
                 }
-                if (tempVmId > ClusterResources.vmArray.size() || tempVmId <= 0) {
+                if (findVmById(tempVmId)==null) {
                     projectTools.clearConsole();
                     System.out.println("This VM ID does not exist!");
                     Thread.sleep(3000);
@@ -222,7 +223,7 @@ public class Admin{
                 }
                 else {
                     projectTools.clearConsole();
-                    System.out.println("Selected VM"+ClusterResources.vmArray.get(tempVmId-1).getVmid()+"!");
+                    System.out.println("Selected VM"+findVmById(tempVmId).getVmid()+"!");
                     Thread.sleep(3000);
                 }
 
@@ -286,8 +287,8 @@ public class Admin{
                             }
                             
                             try {
-                                projectTools.dotLoading("Updating VM with the chosen specifications...", 5);
-                                ClusterResources.vmArray.get(tempVmId-1).setVmOs(userOs);
+                                projectTools.propellerLoading("Updating VM with the chosen specifications...", 5);
+                                findVmById(tempVmId).setVmOs(userOs);
                                 System.out.println("VM updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
@@ -299,6 +300,8 @@ public class Admin{
                             
                             break;
                         }
+
+                        break;
                     
                     case 2:
                         //CPU
@@ -331,7 +334,7 @@ public class Admin{
                                 Thread.sleep(3000);
                                 continue;
                             }
-                            else if ((ClusterResources.vmArray.get(tempVmId).getVmcpu()-userCpu)+adminCluster.getClcpu() < 0) {
+                            else if ((findVmById(tempVmId).getVmcpu()-userCpu)+adminCluster.getClcpu() < 0) {
                                 projectTools.clearConsole();
                                 System.out.println("Not enough resources available on the cluster!");
                                 Thread.sleep(3000);
@@ -340,7 +343,7 @@ public class Admin{
 
                             try {
                                 projectTools.propellerLoading("Updating Cluster...", 5);
-                                adminCluster.setClcpu(adminCluster.getClcpu()+(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmcpu()-userCpu));
+                                adminCluster.setClcpu(adminCluster.getClcpu()+(((PlainVM) findVmById(tempVmId)).getVmcpu()-userCpu));
                                 System.out.println("Cluster updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
@@ -352,19 +355,21 @@ public class Admin{
 
                             try {
                                 projectTools.propellerLoading("Updating VM with the assigned specifications....", 5);
-                                ((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).setVmcpu(userCpu);
+                                ((PlainVM) findVmById(tempVmId)).setVmcpu(userCpu);
                                 System.out.println("VM updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
                                 projectTools.clearConsole();
                                 System.out.println("ERROR: Could not update VM!");
                                 Thread.sleep(3000);
-                                adminCluster.setClcpu(adminCluster.getClcpu()-(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmcpu()-userCpu));
+                                adminCluster.setClcpu(adminCluster.getClcpu()-(((PlainVM) findVmById(resourceToUpdate)).getVmcpu()-userCpu));
                                 continue;
                             }
 
                             break;
                         }
+
+                        break;
                             
                     case 3:
                         //RAM
@@ -398,7 +403,7 @@ public class Admin{
                                 Thread.sleep(3000);
                                 continue;
                             }
-                            else if ((ClusterResources.vmArray.get(tempVmId-1).getVmram()-userCpu)+adminCluster.getClram() < 0) {
+                            else if ((findVmById(tempVmId).getVmram()-userCpu)+adminCluster.getClram() < 0) {
                                 projectTools.clearConsole();
                                 System.out.println("Not enough resources available on the cluster!");
                                 Thread.sleep(3000);
@@ -407,7 +412,7 @@ public class Admin{
 
                             try {
                                 projectTools.propellerLoading("Updating Cluster...", 5);
-                                adminCluster.setClram(adminCluster.getClram()+(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmram()-userRam));
+                                adminCluster.setClram(adminCluster.getClram()+(((PlainVM) findVmById(tempVmId)).getVmram()-userRam));
                                 System.out.println("Cluster updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
@@ -419,19 +424,21 @@ public class Admin{
 
                             try {
                                 projectTools.propellerLoading("Updating VM with the assigned specifications...", resourceToUpdate);
-                                ((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).setVmram(userRam);
+                                ((PlainVM) findVmById(tempVmId)).setVmram(userRam);
                                 System.out.println("VM updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
                                 projectTools.clearConsole();
                                 System.out.println("ERROR: Could not update VM!");
                                 Thread.sleep(3000);
-                                adminCluster.setClram(adminCluster.getClram()-(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmram()-userRam));
+                                adminCluster.setClram(adminCluster.getClram()-(((PlainVM) findVmById(tempVmId)).getVmram()-userRam));
                                 continue;
                             }
 
                             break;
                         }
+
+                        break;
                             
                     case 4:
                         //SSD
@@ -440,7 +447,7 @@ public class Admin{
 
                         projectTools.clearConsole();
 
-                        if (ClusterResources.vmArray.get(tempVmId-1) instanceof PlainVM == false) {
+                        if (findVmById(tempVmId) instanceof PlainVM == false) {
                             projectTools.clearConsole();
                             System.out.println("This type of resource is not available to this VM!");
                             Thread.sleep(3000);
@@ -472,7 +479,7 @@ public class Admin{
                                 Thread.sleep(3000);
                                 continue;
                             }
-                            else if ((((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()-userSsd)+adminCluster.getClssd() < 0) {
+                            else if ((((PlainVM) findVmById(tempVmId)).getVmssd()-userSsd)+adminCluster.getClssd() < 0) {
                                 projectTools.clearConsole();
                                 System.out.println("Not enough resources available on the cluster!");
                                 Thread.sleep(3000);
@@ -481,7 +488,7 @@ public class Admin{
 
                             try {
                                 projectTools.propellerLoading("Updating Cluster...", 5);
-                                adminCluster.setClssd(adminCluster.getClssd()+(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()-userSsd));
+                                adminCluster.setClssd(adminCluster.getClssd()+(((PlainVM) findVmById(tempVmId)).getVmssd()-userSsd));
                                 System.out.println("Cluster updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
@@ -495,19 +502,21 @@ public class Admin{
                             
                             try {
                                 projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
-                                ((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).setVmssd(userSsd);
+                                ((PlainVM) findVmById(tempVmId)).setVmssd(userSsd);
                                 System.out.println("VM updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
                                 projectTools.clearConsole();
                                 System.out.println("ERROR: Could not update VM!");
                                 Thread.sleep(3000);
-                                adminCluster.setClssd(adminCluster.getClssd()-(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()-userSsd));
+                                adminCluster.setClssd(adminCluster.getClssd()-(((PlainVM) findVmById(tempVmId)).getVmssd()-userSsd));
                                 continue;
                             }
 
                             break;
                         }
+
+                        break;
 
                     case 5:
                         inputChecker = null;
@@ -516,7 +525,7 @@ public class Admin{
                         projectTools.clearConsole();
 
                         //GPU
-                        if (ClusterResources.vmArray.get(tempVmId-1) instanceof VmGPU == false) {
+                        if (findVmById(tempVmId) instanceof VmGPU == false) {
                             projectTools.clearConsole();
                             System.out.println("This type of resource is not available to this VM!");
                             Thread.sleep(3000);
@@ -548,7 +557,7 @@ public class Admin{
                                 Thread.sleep(3000);
                                 continue;
                             }
-                            else if ((((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()-userGpu)+adminCluster.getClgpu() < 0) {
+                            else if ((((VmGPU) findVmById(tempVmId)).getVmgpu()-userGpu)+adminCluster.getClgpu() < 0) {
                                 projectTools.clearConsole();
                                 System.out.println("Not enough resources available on the cluster!");
                                 Thread.sleep(3000);
@@ -558,7 +567,7 @@ public class Admin{
                             
                             try {
                                 projectTools.propellerLoading("Updating Cluster...", 5);
-                                adminCluster.setClgpu(adminCluster.getClgpu()+(((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()-userGpu));
+                                adminCluster.setClgpu(adminCluster.getClgpu()+(((VmGPU) findVmById(tempVmId)).getVmgpu()-userGpu));
                                 System.out.println("Cluster Updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
@@ -569,19 +578,21 @@ public class Admin{
 
                             try {
                                 projectTools.propellerLoading("Updating VM with the assigned specifications... ", 5);
-                                ((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).setVmgpu(userGpu);
+                                ((VmGPU) findVmById(tempVmId)).setVmgpu(userGpu);
                                 System.out.println("VM Updated!");
                                 Thread.sleep(3000);
                             } catch (Exception e) {
                                 projectTools.clearConsole();
                                 System.out.println("ERROR: Could not update VM!");
                                 Thread.sleep(3000);
-                                adminCluster.setClgpu(adminCluster.getClgpu()-(((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()-userGpu));
+                                adminCluster.setClgpu(adminCluster.getClgpu()-(((VmGPU) findVmById(tempVmId)).getVmgpu()-userGpu));
                                 continue;
                             }
 
                             break;
                         }
+
+                        break;
                     
                     case 6:
                         inputChecker = null;
@@ -590,7 +601,7 @@ public class Admin{
                         projectTools.clearConsole();
 
                         //BANDWIDTH
-                        if (ClusterResources.vmArray.get(tempVmId-1) instanceof VmNetworked == false && ClusterResources.vmArray.get(tempVmId-1) instanceof VmNetworkedGPU == false) {
+                        if (findVmById(tempVmId) instanceof VmNetworked == false && findVmById(tempVmId) instanceof VmNetworkedGPU == false) {
                             projectTools.clearConsole();
                             System.out.println("This type of resource is not available to this VM!");
                             Thread.sleep(3000);
@@ -616,46 +627,90 @@ public class Admin{
                                     continue;
                                 }
                             }
-                            if (userBandwidth <= 0) {
+
+                            if (findVmById(tempVmId) instanceof VmNetworked) {
+                                if (userBandwidth <= 0) {
+                                    projectTools.clearConsole();
+                                    System.out.println("Bandwidth is required in this VM!");
+                                    Thread.sleep(3000);
+                                    continue;
+                                }
+                                else if ((((VmNetworked) findVmById(tempVmId)).getVmbandwidth()-userBandwidth)+adminCluster.getClbandwidth() < 0) {
+                                    projectTools.clearConsole();
+                                    System.out.println("Not enough resources available on the cluster!");
+                                    Thread.sleep(3000);
+                                    continue;
+                                }
+
+                                try {
+                                    projectTools.propellerLoading("Updating Cluster...", 5);
+                                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworked) findVmById(tempVmId)).getVmbandwidth()-userBandwidth));
+                                    System.out.println("Cluster Updated!");
+                                    Thread.sleep(3000);
+                                } catch (Exception e) {
+                                    projectTools.clearConsole();
+                                    System.out.println("ERROR: Could not update Cluster!");
+                                    Thread.sleep(3000);
+                                    continue;
+                                }
+
+                                try {
+                                    projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
+                                    ((VmNetworked) findVmById(tempVmId)).setVmbandwidth(userBandwidth);
+                                    System.out.println("VM Updated!");
+                                    Thread.sleep(3000);
+                                } catch (Exception e) {
+                                    projectTools.clearConsole();
+                                    System.out.println("ERROR: Could not update VM!");
+                                    Thread.sleep(3000);
+                                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()-(((VmNetworked) findVmById(tempVmId)).getVmbandwidth()-userBandwidth));
+                                    continue;
+                                }
+                            }
+                            else if (findVmById(tempVmId) instanceof VmNetworkedGPU) {
+                                if (userBandwidth <= 0) {
                                 projectTools.clearConsole();
                                 System.out.println("Bandwidth is required in this VM!");
                                 Thread.sleep(3000);
                                 continue;
                             }
-                            else if ((((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()-userBandwidth)+adminCluster.getClbandwidth() < 0) {
-                                projectTools.clearConsole();
-                                System.out.println("Not enough resources available on the cluster!");
-                                Thread.sleep(3000);
-                                continue;
-                            }
+                                else if ((((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()-userBandwidth)+adminCluster.getClbandwidth() < 0) {
+                                    projectTools.clearConsole();
+                                    System.out.println("Not enough resources available on the cluster!");
+                                    Thread.sleep(3000);
+                                    continue;
+                                }
 
-                            try {
-                                projectTools.propellerLoading("Updating Cluster...", 5);
-                                adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()-userBandwidth));
-                                System.out.println("Cluster Updated!");
-                                Thread.sleep(3000);
-                            } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update Cluster!");
-                                Thread.sleep(3000);
-                                continue;
-                            }
+                                try {
+                                    projectTools.propellerLoading("Updating Cluster...", 5);
+                                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()-userBandwidth));
+                                    System.out.println("Cluster Updated!");
+                                    Thread.sleep(3000);
+                                } catch (Exception e) {
+                                    projectTools.clearConsole();
+                                    System.out.println("ERROR: Could not update Cluster!");
+                                    Thread.sleep(3000);
+                                    continue;
+                                }
 
-                            try {
-                                projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
-                                ((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).setVmbandwidth(userBandwidth);
-                                System.out.println("VM Updated!");
-                                Thread.sleep(3000);
-                            } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update VM!");
-                                Thread.sleep(3000);
-                                adminCluster.setClbandwidth(adminCluster.getClbandwidth()-(((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()-userBandwidth));
-                                continue;
+                                try {
+                                    projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
+                                    ((VmNetworkedGPU) findVmById(tempVmId)).setVmbandwidth(userBandwidth);
+                                    System.out.println("VM Updated!");
+                                    Thread.sleep(3000);
+                                } catch (Exception e) {
+                                    projectTools.clearConsole();
+                                    System.out.println("ERROR: Could not update VM!");
+                                    Thread.sleep(3000);
+                                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()-(((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()-userBandwidth));
+                                    continue;
+                                }
                             }
-
+                            
                             break;
                         }
+
+                        break;
                     
                     default:
                         projectTools.clearConsole();
@@ -694,11 +749,11 @@ public class Admin{
                 }
             }
             
-            switch ((ClusterResources.vmArray.get(tempVmId-1)).getVmType()) {
+            switch ((findVmById(tempVmId)).getVmType()) {
                 case "PlainVM":
-                    adminCluster.setClcpu(adminCluster.getClcpu()+(ClusterResources.vmArray.get(tempVmId-1).getVmcpu()));
-                    adminCluster.setClram(adminCluster.getClram()+(ClusterResources.vmArray.get(tempVmId-1).getVmram()));
-                    adminCluster.setClssd(adminCluster.getClssd()+(((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()));
+                    adminCluster.setClcpu(adminCluster.getClcpu()+(findVmById(tempVmId).getVmcpu()));
+                    adminCluster.setClram(adminCluster.getClram()+(findVmById(tempVmId).getVmram()));
+                    adminCluster.setClssd(adminCluster.getClssd()+(((PlainVM) findVmById(tempVmId)).getVmssd()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
                     System.out.println("Cluster updated!");
@@ -706,10 +761,10 @@ public class Admin{
                     break;
 
                 case "VmGPU":
-                    adminCluster.setClcpu(adminCluster.getClcpu()+(ClusterResources.vmArray.get(tempVmId-1).getVmcpu()));
-                    adminCluster.setClram(adminCluster.getClram()+(ClusterResources.vmArray.get(tempVmId-1).getVmram()));
-                    adminCluster.setClssd(adminCluster.getClssd()+(((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()));
-                    adminCluster.setClgpu(adminCluster.getClgpu()+(((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()));
+                    adminCluster.setClcpu(adminCluster.getClcpu()+(findVmById(tempVmId).getVmcpu()));
+                    adminCluster.setClram(adminCluster.getClram()+(findVmById(tempVmId).getVmram()));
+                    adminCluster.setClssd(adminCluster.getClssd()+(((VmGPU) findVmById(tempVmId)).getVmssd()));
+                    adminCluster.setClgpu(adminCluster.getClgpu()+(((VmGPU) findVmById(tempVmId)).getVmgpu()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
                     System.out.println("Cluster updated!");
@@ -717,10 +772,10 @@ public class Admin{
                     break;
 
                 case "VmNetworked":
-                    adminCluster.setClcpu(adminCluster.getClcpu()+(ClusterResources.vmArray.get(tempVmId-1).getVmcpu()));
-                    adminCluster.setClram(adminCluster.getClram()+(ClusterResources.vmArray.get(tempVmId-1).getVmram()));
-                    adminCluster.setClssd(adminCluster.getClssd()+(((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()));
-                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()));
+                    adminCluster.setClcpu(adminCluster.getClcpu()+(findVmById(tempVmId).getVmcpu()));
+                    adminCluster.setClram(adminCluster.getClram()+(findVmById(tempVmId).getVmram()));
+                    adminCluster.setClssd(adminCluster.getClssd()+(((VmNetworked) findVmById(tempVmId)).getVmssd()));
+                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworked) findVmById(tempVmId)).getVmbandwidth()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
                     System.out.println("Cluster updated!");
@@ -728,11 +783,11 @@ public class Admin{
                     break;
 
                 case "VmNetworkedGPU":
-                    adminCluster.setClcpu(adminCluster.getClcpu()+(ClusterResources.vmArray.get(tempVmId-1).getVmcpu()));
-                    adminCluster.setClram(adminCluster.getClram()+(ClusterResources.vmArray.get(tempVmId-1).getVmram()));
-                    adminCluster.setClssd(adminCluster.getClssd()+(((VmNetworkedGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmssd()));
-                    adminCluster.setClgpu(adminCluster.getClgpu()+(((VmNetworkedGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmgpu()));
-                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworkedGPU) ClusterResources.vmArray.get(tempVmId-1)).getVmbandwidth()));
+                    adminCluster.setClcpu(adminCluster.getClcpu()+(findVmById(tempVmId).getVmcpu()));
+                    adminCluster.setClram(adminCluster.getClram()+(findVmById(tempVmId).getVmram()));
+                    adminCluster.setClssd(adminCluster.getClssd()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmssd()));
+                    adminCluster.setClgpu(adminCluster.getClgpu()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmgpu()));
+                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
                     System.out.println("Cluster updated!");
@@ -844,7 +899,7 @@ public class Admin{
                 Thread.sleep(3000);
                 continue;
             }
-            //(vmRes-resInput)+clRes>=clRes
+            
             else if (userCpu > adminCluster.getClcpu()) {
                 projectTools.clearConsole();
                 System.out.println("ERROR: Not enough resources available on the cluster!");
@@ -1017,7 +1072,7 @@ public class Admin{
                 Thread.sleep(3000);
                 continue;
             }
-            else if (userBandwidth > adminCluster.getClgpu()) {
+            else if (userBandwidth > adminCluster.getClbandwidth()) {
                 projectTools.clearConsole();
                 System.out.println("ERROR: Not enough resources available on the cluster!");
                 Thread.sleep(3000);
@@ -1030,11 +1085,11 @@ public class Admin{
 
     public String reportCluster() {
         String report = "------- ~Cluster~ -------"+"\n"+
-        " CPU Cores: "+adminCluster.getClcpu()+"\n"+
+        "\u001B[34m"+" CPU Cores: "+adminCluster.getClcpu()+"\n"+
         " RAM: "+adminCluster.getClram()+" GB"+"\n"+
         " SSD: "+adminCluster.getClssd()+" GB"+"\n"+
         " GPUs: "+adminCluster.getClgpu()+"\n"+
-        " Bandwidth: "+adminCluster.getClbandwidth()+" Gb/sec\n"+
+        " Bandwidth: "+adminCluster.getClbandwidth()+" Gb/sec"+"\u001B[0m\n"+
         "-------------------------\n";
         return report;
     }
@@ -1090,17 +1145,17 @@ public class Admin{
                         continue;
                     }
                 }
-                if (tempVmId > ClusterResources.vmArray.size() || tempVmId <= 0) {
+                if (findVmById(tempVmId) == null) {
                     projectTools.clearConsole();
                     System.out.println("This VM ID does not exist!");
                     Thread.sleep(3000);
                     continue;
                 }
                 else {
-                    switch (ClusterResources.vmArray.get(tempVmId-1).getVmType()) {
+                    switch (findVmById(tempVmId).getVmType()) {
                         case "PlainVM":
                             projectTools.clearConsole();
-                            ((PlainVM) ClusterResources.vmArray.get(tempVmId-1)).printVmReport();
+                            ((PlainVM) findVmById(tempVmId)).printVmReport();
                             System.out.println("---------------");
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
@@ -1108,7 +1163,7 @@ public class Admin{
                         
                         case "VmGPU":
                             projectTools.clearConsole();
-                            ((VmGPU) ClusterResources.vmArray.get(tempVmId-1)).printVmReport();
+                            ((VmGPU) findVmById(tempVmId)).printVmReport();
                             System.out.println("---------------");
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
@@ -1116,7 +1171,7 @@ public class Admin{
 
                         case "VmNetworked":
                             projectTools.clearConsole();
-                            ((VmNetworked) ClusterResources.vmArray.get(tempVmId-1)).printVmReport();
+                            ((VmNetworked) findVmById(tempVmId)).printVmReport();
                             System.out.println("---------------");
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
@@ -1124,7 +1179,7 @@ public class Admin{
 
                         case "VmNetworkedGPU":
                             projectTools.clearConsole();
-                            ((VmNetworkedGPU) ClusterResources.vmArray.get(tempVmId-1)).printVmReport();
+                            ((VmNetworkedGPU) findVmById(tempVmId)).printVmReport();
                             System.out.println("---------------\n");
                             System.out.print("\nPress Enter to continue...");
                             oneScanner.nextLine();
