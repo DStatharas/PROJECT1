@@ -17,12 +17,22 @@ public class App
         while (true) {
             inputChecker = null;
             intChecker = null;
+
             projectTools.clearConsole();
-            System.out.println("\u001B[32m" + "\n========== All parametric data files updated successfully ==========" + "\u001B[0m" + "\n");
+
+            ConsoleColors.setColor(ConsoleColors.CYAN_BOLD);
             System.out.println("Welcome to Virtual Manager 2024: Cluster Boogaloo!\n");
+            ConsoleColors.reset();
+
+            ConsoleColors.setColor(ConsoleColors.BLUE);
             System.out.println(mainAdminInstance.reportCluster());
+            ConsoleColors.reset();
+
+            ConsoleColors.setColor(ConsoleColors.PURPLE);
             mainAdminInstance.displayVmArray();
             System.out.println("\n-----------------------------------------"+"\n\n");
+            ConsoleColors.reset();
+
             System.out.println("Please select one of the following options:\n");
             System.out.println("1: Create new Virtual Machine\n2: Update an existing Virtual Machine\n3: Delete a Virtual Machine\n4: Receive a report on a Virtual Machine's available resources\n0: Terminate Application\n");
             System.out.print("Select option: ");
@@ -30,8 +40,7 @@ public class App
                 intChecker = Integer.parseInt(oneScanner.next());
                 projectTools.clearConsole();
             } catch (Exception e) {
-                System.out.println("Invalid input!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                 continue;
             }
                 

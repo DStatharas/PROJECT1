@@ -52,4 +52,44 @@ public abstract class projectTools {
         }
         clearConsole();
     }
+
+    public static void flasher(String flashable, Integer flashes, Integer flashingInterval) throws InterruptedException {
+        for (int i = 0; i < flashes; i++) {
+            clearConsole();
+            System.out.println(flashable);
+            Thread.sleep(flashingInterval);
+            clearConsole();
+            Thread.sleep(flashingInterval);
+        }
+    }
+
+    public static void colorFlasher(String flashable, Integer flashes, Integer flashingInterval, String color1) throws InterruptedException {
+        for (int i = 0; i < flashes; i++) {
+            clearConsole();
+            System.out.print(color1);
+            System.out.println(flashable);
+            Thread.sleep(flashingInterval);
+            clearConsole();
+            Thread.sleep(flashingInterval);
+        }
+
+        clearConsole();
+        ConsoleColors.reset();
+    }
+
+    public static void colorFlasher(String flashable, Integer flashes, Integer flashingInterval, String color1, String color2) throws InterruptedException {
+        for (int i = 0; i < flashes; i++) {
+            clearConsole();
+            System.out.print(color1);
+            System.out.println(flashable);
+            Thread.sleep(flashingInterval);
+            clearConsole();
+            System.out.print(color2);
+            System.out.println(flashable);
+            Thread.sleep(flashingInterval);
+            ConsoleColors.reset();
+        }
+
+        clearConsole();
+    }
 }

@@ -1085,11 +1085,11 @@ public class Admin{
 
     public String reportCluster() {
         String report = "------- ~Cluster~ -------"+"\n"+
-        "\u001B[34m"+" CPU Cores: "+adminCluster.getClcpu()+"\n"+
+        " CPU Cores: "+adminCluster.getClcpu()+"\n"+
         " RAM: "+adminCluster.getClram()+" GB"+"\n"+
         " SSD: "+adminCluster.getClssd()+" GB"+"\n"+
         " GPUs: "+adminCluster.getClgpu()+"\n"+
-        " Bandwidth: "+adminCluster.getClbandwidth()+" Gb/sec"+"\u001B[0m\n"+
+        " Bandwidth: "+adminCluster.getClbandwidth()+" Gb/sec\n"+
         "-------------------------\n";
         return report;
     }
