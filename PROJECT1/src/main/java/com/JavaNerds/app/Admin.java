@@ -1,6 +1,7 @@
 package com.JavaNerds.app;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class Admin{
@@ -1205,7 +1206,7 @@ public class Admin{
             exitCheck = false;
 
             projectTools.clearConsole();
-            System.out.print("Enter the expected runtime of the program in seconds or Q to cancel: ");
+            System.out.print("Enter the expected execution time of the program in seconds or Q to cancel: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
 
@@ -1225,7 +1226,7 @@ public class Admin{
             }
             if (userExpectedTime <= 0) {
                 projectTools.clearConsole();
-                System.out.println("ERROR: Runtime cannot be 0!");
+                System.out.println("ERROR: Execution time cannot be 0!");
                 Thread.sleep(3000);
                 continue;
             }
@@ -1406,6 +1407,10 @@ public class Admin{
                 e.setPriority(e.getPriority()+(e.getpBandwidth()/totalBandwidth));
             }
         }
+    }
+
+    public void sortProgramArrayPriority() {
+        pArray.sort(Comparator.comparing(Program::getPriority));
     }
 
 }

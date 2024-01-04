@@ -19,7 +19,7 @@ public class App
             intChecker = null;
 
             projectTools.clearConsole();
-            
+
             ConsoleColors.setColor(ConsoleColors.CYAN_BOLD);
             System.out.println("Welcome to Virtual Manager 2024: Cluster Boogaloo!\n");
             ConsoleColors.reset();

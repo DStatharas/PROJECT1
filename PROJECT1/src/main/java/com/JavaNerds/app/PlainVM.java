@@ -22,6 +22,29 @@ public class PlainVM extends VM{
         super.printVmReport();
     }
 
+    @Override
+    public void calculateVmLoad() {
+        double a;
+        double b;
+        double cpuDiv;
+        double ramDiv;
+        double ssdDiv;
+
+        a = this.vmcpu;
+        b = this.allocvmcpu;
+        cpuDiv = b/a;
+        
+        a = this.vmram;
+        b = this.allocvmram;
+        ramDiv = b/a;
+
+        a = this.vmssd;
+        b = this.allocvmssd;
+        ssdDiv = b/a;
+
+        this.vmLoad = (cpuDiv+ramDiv+ssdDiv)/3;
+    }
+
     //Getters/Setters
     public Integer getVmssd() {
         return vmssd;

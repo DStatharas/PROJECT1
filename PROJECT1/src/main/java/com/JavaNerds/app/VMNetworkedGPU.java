@@ -22,6 +22,39 @@ public class VmNetworkedGPU extends VmGPU{
         super.printVmReport();
     }
 
+    @Override
+    public void calculateVmLoad() {
+        double a;
+        double b;
+        double cpuDiv;
+        double ramDiv;
+        double ssdDiv;
+        double bandDiv;
+        double gpuDiv;
+
+        a = this.vmcpu;
+        b = this.allocvmcpu;
+        cpuDiv = b/a;
+        
+        a = this.vmram;
+        b = this.allocvmram;
+        ramDiv = b/a;
+
+        a = this.vmssd;
+        b = this.allocvmssd;
+        ssdDiv = b/a;
+
+        a = this.vmgpu;
+        b = this.allocvmgpu;
+        gpuDiv = b/a;
+
+        a = this.vmbandwidth;
+        b = this.allocvmbandwidth;
+        bandDiv = b/a;
+
+        this.vmLoad = (cpuDiv+ramDiv+ssdDiv+gpuDiv+bandDiv)/5;
+    }
+
     //Getters/Setters
     public Integer getVmbandwidth() {
         return vmbandwidth;
