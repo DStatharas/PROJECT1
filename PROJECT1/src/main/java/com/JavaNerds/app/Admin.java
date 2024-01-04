@@ -1,9 +1,10 @@
 package com.JavaNerds.app;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Admin{
-    
+
     ClusterResources adminCluster = ClusterResources.getInstance();
 
     Scanner oneScanner = new Scanner(System.in);
@@ -17,7 +18,17 @@ public class Admin{
     private Integer userBandwidth = null;
     private Integer userOs = null;
     private Integer tempVmId = null;
-    
+    private Integer userExpectedTime = null;
+    private Integer totalCpu = 0;
+    private Integer totalRam = 0;
+    private Integer totalSsd = 0;
+    private Integer totalGpu = 0;
+    private Integer totalBandwidth = 0;
+
+    private Integer userPChoice = null;
+    public ArrayList<Program> pArray = new ArrayList<>();
+
+
     public void createVM() throws InterruptedException {
         Integer userVmType = null;
 
@@ -179,6 +190,108 @@ public class Admin{
         }
     }
     
+    public void programMenu() throws InterruptedException {
+        while (true) {
+            inputChecker = null;
+            userPChoice = null;
+
+            projectTools.clearConsole();
+
+            System.out.print("Please select one of the following options:\n "+"\n\n"+"1: Create program"+"\n"+"2: VM Report"+"\n"+"0: Quit");
+            inputChecker = oneScanner.next();
+            oneScanner.nextLine();
+            try {
+                userPChoice = Integer.parseInt(inputChecker);
+            } catch (Exception e) {
+                projectTools.clearConsole();
+                System.out.println("ERROR: Invalid input!");
+                Thread.sleep(3000);
+                continue;
+            }
+
+            switch (userPChoice) {
+                case 1:
+                    createProgram();
+                    break;
+                
+                case 2:
+                    reportVm();
+                    continue;
+
+                case 0:
+                    break;
+
+                default:
+                    projectTools.clearConsole();
+                    System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
+                    continue;
+            }
+        }
+    }
+
+    public void createProgram() throws InterruptedException {
+
+        while (true) {
+            inputChecker = null;
+            exitCheck = false;
+            userPChoice = null;
+            userCpu = null;
+            userRam = null;
+            userSsd = null;
+            userGpu = null;
+            userBandwidth = null;
+
+            projectTools.clearConsole();
+
+            setUserCPU();
+            if (exitCheck == true) {
+                continue;
+            }
+            setUserRAM();
+            if (exitCheck == true) {
+                continue;
+            }
+            setUserSSD();
+            if (exitCheck == true) {
+                continue;
+            }
+            setUserGpu();
+            if (exitCheck == true) {
+                continue;
+            }
+            setUserBandwidth();
+            if (exitCheck == true) {
+                continue;
+            }
+
+            setUserExpectedTime();
+            if (exitCheck == true) {
+                continue;
+            }
+
+            //Panic!
+            adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
+            adminCluster.setClram(adminCluster.getClram()-userRam);
+            adminCluster.setClssd(adminCluster.getClssd()-userSsd);
+            adminCluster.setClgpu(adminCluster.getClgpu()-userGpu);
+            adminCluster.setClbandwidth(adminCluster.getClbandwidth()-userBandwidth);
+
+            try {
+                projectTools.propellerLoading("Creating VM...", 5);
+                ClusterResources.vmArray.add(new VmNetworkedGPU(4, userOs, userCpu, userRam, userSsd, userGpu, userBandwidth));
+                System.out.println("VM created!");
+                Thread.sleep(3000);
+            } catch (Exception e) {
+                projectTools.clearConsole();
+                System.out.println("ERROR: VM could not be created!");
+                Thread.sleep(3000);
+                continue;
+            }
+            break;
+        }
+    }
+
     public void updateResources() throws InterruptedException {
         Integer resourceToUpdate = null;
 
@@ -738,6 +851,7 @@ public class Admin{
             if (inputChecker.equalsIgnoreCase("q")) {
                 break;
             }
+
             else {
                 try {
                     tempVmId = Integer.parseInt(inputChecker);
@@ -786,7 +900,7 @@ public class Admin{
                     adminCluster.setClcpu(adminCluster.getClcpu()+(findVmById(tempVmId).getVmcpu()));
                     adminCluster.setClram(adminCluster.getClram()+(findVmById(tempVmId).getVmram()));
                     adminCluster.setClssd(adminCluster.getClssd()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmssd()));
-                    adminCluster.setClgpu(adminCluster.getClgpu()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmgpu()));
+                    adminCluster.setClgpu(adminCluster.getClgpu()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmgpu())); 
                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
@@ -795,13 +909,14 @@ public class Admin{
                     break;
 
                 default:
+                projectTools.clearConsole();
                     System.out.println("VM Type not recognized!");
                     Thread.sleep(3000);
                     continue;
             }
 
             try {
-                ClusterResources.vmArray.remove(tempVmId-1);
+                ClusterResources.vmArray.remove(findVmById(tempVmId));
                 projectTools.propellerLoading("Deleting VM...", 5);
                 System.out.println("VM deleted!");
                 Thread.sleep(3000);
@@ -1083,6 +1198,42 @@ public class Admin{
         }
     }
 
+    private void setUserExpectedTime() throws InterruptedException {
+        while (true) {
+            inputChecker = null;
+            userExpectedTime = null;
+            exitCheck = false;
+
+            projectTools.clearConsole();
+            System.out.print("Enter the expected runtime of the program in seconds or Q to cancel: ");
+            inputChecker = oneScanner.next();
+            oneScanner.nextLine();
+
+            if (inputChecker.equalsIgnoreCase("q")) {
+                exitCheck = true;
+                break;
+            }
+            else {
+                try {
+                    userExpectedTime = Integer.parseInt(inputChecker);
+                } catch (Exception e) {
+                    projectTools.clearConsole();
+                    System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
+                    continue;
+                }
+            }
+            if (userExpectedTime <= 0) {
+                projectTools.clearConsole();
+                System.out.println("ERROR: Runtime cannot be 0!");
+                Thread.sleep(3000);
+                continue;
+            }
+
+            break;
+        }
+    }
+
     public String reportCluster() {
         String report = "------- ~Cluster~ -------"+"\n"+
         " CPU Cores: "+adminCluster.getClcpu()+"\n"+
@@ -1100,7 +1251,7 @@ public class Admin{
                 return vm;
             }
         }
-        return null;
+        return new PlainVM(0, 0, 0, 0, 0);
     }
 
     public void reportVm() throws InterruptedException {
@@ -1115,13 +1266,14 @@ public class Admin{
 
                 if (inputChecker.equalsIgnoreCase("a")) {
                     projectTools.clearConsole();
-                    System.out.println("-----------------\n Total VM Report\n-----------------\n\n");
+                    System.out.println("-------------------\n  Total VM Report\n-------------------\n\n");
                     for (VM element : ClusterResources.vmArray) {
                         try {
                             element.printVmReport();
-                            System.out.println("---------------");
+                            System.out.println("-------------------");
                             System.out.println("\n");
                         } catch (Exception e) {
+                            projectTools.clearConsole();
                             System.out.println("ERROR: Cannot print VM(s)!");
                             Thread.sleep(3000);
                             break;
@@ -1156,7 +1308,7 @@ public class Admin{
                         case "PlainVM":
                             projectTools.clearConsole();
                             ((PlainVM) findVmById(tempVmId)).printVmReport();
-                            System.out.println("---------------");
+                            System.out.println("-------------------");
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
@@ -1164,7 +1316,7 @@ public class Admin{
                         case "VmGPU":
                             projectTools.clearConsole();
                             ((VmGPU) findVmById(tempVmId)).printVmReport();
-                            System.out.println("---------------");
+                            System.out.println("-------------------");
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
@@ -1172,7 +1324,7 @@ public class Admin{
                         case "VmNetworked":
                             projectTools.clearConsole();
                             ((VmNetworked) findVmById(tempVmId)).printVmReport();
-                            System.out.println("---------------");
+                            System.out.println("-------------------");
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
@@ -1180,7 +1332,7 @@ public class Admin{
                         case "VmNetworkedGPU":
                             projectTools.clearConsole();
                             ((VmNetworkedGPU) findVmById(tempVmId)).printVmReport();
-                            System.out.println("---------------\n");
+                            System.out.println("-------------------\n");
                             System.out.print("\nPress Enter to continue...");
                             oneScanner.nextLine();
                             continue;
@@ -1205,4 +1357,55 @@ public class Admin{
             }
         }
     }
+
+    public void totalResCalc() throws InterruptedException {
+        if (ClusterResources.vmArray.isEmpty() == false) {
+            for (VM e : ClusterResources.vmArray) {
+                this.totalCpu += e.getVmcpu();
+                this.totalRam += e.getVmram();
+                if (e instanceof PlainVM) {
+                    this.totalSsd += ((PlainVM)e).getVmssd();
+                }
+                if (e instanceof VmGPU) {
+                    this.totalGpu += ((VmGPU)e).getVmgpu();
+                }
+                if (e instanceof VmNetworked) {
+                    this.totalBandwidth += ((VmNetworked)e).getVmbandwidth();
+                } else if (e instanceof VmNetworkedGPU) {
+                    this.totalBandwidth += ((VmNetworkedGPU)e).getVmbandwidth();
+                }
+            }
+        } else {
+            projectTools.clearConsole();
+            System.out.println("ERROR: Cannot set total resources - no available VMs!");
+            Thread.sleep(3000);
+        }
+    }
+
+    public void setProgramPriority() throws InterruptedException {
+        totalResCalc();
+        
+        for (Program e : pArray) {
+            if (totalCpu != 0) {
+                e.setPriority(e.getPriority()+(e.getpCpu()/totalCpu));
+            }
+
+            if (totalRam != 0) {
+                e.setPriority(e.getPriority()+(e.getpRam()/totalRam));
+            }
+
+            if (totalSsd != 0) {
+                e.setPriority(e.getPriority()+(e.getpSsd()/totalSsd));
+            }
+
+            if (totalGpu != 0) {
+                e.setPriority(e.getPriority()+(e.getpGpu()/totalGpu));
+            }
+
+            if (totalBandwidth != 0) {
+                e.setPriority(e.getPriority()+(e.getpBandwidth()/totalBandwidth));
+            }
+        }
+    }
+
 }

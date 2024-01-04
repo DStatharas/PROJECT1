@@ -2,6 +2,7 @@ package com.JavaNerds.app;
 
 public class PlainVM extends VM{
     protected Integer vmssd;
+    protected Integer allocvmssd = 0;
     
 
     public PlainVM(Integer vmType, Integer vmOs, Integer vmcpu, Integer vmram, Integer vmssd) {
@@ -10,17 +11,32 @@ public class PlainVM extends VM{
     }
 
     @Override
-    public void printVmReport() {
-        super.printVmReport();
-        System.out.println("SSD: "+this.vmssd+" GB");
+    protected void vmReportArrayAdder() {
+        super.vmReportArrayAdder();
+        vmReportAvailableArray.add("SSD: "+this.vmssd+" GB"+"\n");
+        vmReportAllocatedArray.add("SSD: "+this.allocvmssd+" GB"+"\n");
     }
 
+    @Override
+    public void printVmReport() {
+        super.printVmReport();
+    }
+
+    //Getters/Setters
     public Integer getVmssd() {
         return vmssd;
     }
 
     public void setVmssd(Integer vmssd) {
         this.vmssd = vmssd;
+    }
+
+    public Integer getAllocvmssd() {
+        return allocvmssd;
+    }
+
+    public void setAllocvmssd(Integer allocvmssd) {
+        this.allocvmssd = allocvmssd;
     }
     
 }

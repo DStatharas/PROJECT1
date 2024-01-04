@@ -2,6 +2,7 @@ package com.JavaNerds.app;
 
 public class VmGPU extends PlainVM{
     protected Integer vmgpu;
+    protected Integer allocvmgpu = 0;
 
     public VmGPU (Integer vmType, Integer vmOs, Integer vmcpu, Integer vmram, Integer vmssd, Integer vmgpu) {
         super(vmType, vmOs, vmcpu, vmram, vmssd);
@@ -9,11 +10,18 @@ public class VmGPU extends PlainVM{
     }
     
     @Override
-    public void printVmReport() {
-        super.printVmReport();
-        System.out.println("GPUs: "+this.vmgpu);
+    protected void vmReportArrayAdder() {
+        super.vmReportArrayAdder();
+        vmReportAvailableArray.add("GPUs: "+this.vmgpu+"\n");
+        vmReportAllocatedArray.add("GPUs: "+this.allocvmcpu+"\n");
     }
 
+    @Override
+    public void printVmReport() {
+        super.printVmReport();
+    }
+
+    //Getters/Setters
     public Integer getVmgpu() {
         return vmgpu;
     }
@@ -22,4 +30,12 @@ public class VmGPU extends PlainVM{
         this.vmgpu = vmgpu;
     }
 
+    public Integer getAllocvmgpu() {
+        return allocvmgpu;
+    }
+
+    public void setAllocvmgpu(Integer allocvmgpu) {
+        this.allocvmgpu = allocvmgpu;
+    }
+    
 }

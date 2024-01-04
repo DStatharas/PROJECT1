@@ -1,5 +1,7 @@
 package com.JavaNerds.app;
 
+import java.util.ArrayList;
+
 abstract class VM{
 
     static Integer vmIdGen = 1;
@@ -10,7 +12,14 @@ abstract class VM{
     protected Integer vmcpu;
     protected Integer vmram;
     protected String vmOs;
+
     protected String[] vmOsOptions = {"WINDOWS", "UBUNTU", "FEDORA"};
+
+    protected Integer allocvmcpu = 0;
+    protected Integer allocvmram = 0;
+
+    protected ArrayList<String> vmReportAvailableArray = new ArrayList<>();
+    protected ArrayList<String> vmReportAllocatedArray = new ArrayList<>();
     
 
     public VM(Integer vmType, Integer vmOs, Integer vmcpu, Integer vmram) {
@@ -22,41 +31,90 @@ abstract class VM{
         this.vmram = vmram;
     }
 
-    public void printVmReport() {
-        System.out.println("--- ~|VM"+this.vmid+"|~ ---"+"\n"+
-        "VM Type: "+this.vmType+"\n"+
-        "OS: "+this.vmOs+"\n"+
-        "CPU Cores: "+this.vmcpu+"\n"+
-        "RAM: "+this.vmram+" GB");
+    protected void vmReportArrayAdder() {
+        vmReportAvailableArray.clear();
+        vmReportAllocatedArray.clear();
+        vmReportAvailableArray.add("CPU Cores: "+this.vmcpu+"\n");
+        vmReportAvailableArray.add("RAM: "+this.vmram+" GB"+"\n");
+
+        vmReportAllocatedArray.add("CPU Cores: "+this.allocvmcpu+"\n");
+        vmReportAllocatedArray.add("RAM: "+this.allocvmram+" GB"+"\n");
     }
 
+    public void printVmReport() {
+        vmReportArrayAdder();
+        System.out.print("----- ~/VM"+this.vmid+"\\~ -----"+"\n");
+        System.out.print("VM Type: "+this.vmType+"\n");
+        System.out.print("VM OS: "+this.vmOs+"\n");
+        System.out.print("--- |Available| ---"+"\n");
+        for (String e : vmReportAvailableArray) {
+            System.out.print(e);
+        }
+        System.out.print("--- |Allocated| ---"+"\n");
+        for (String e : vmReportAllocatedArray) {
+            System.out.print(e);
+        }
+    }
 
+    //Getters/Setters
     public String getVmType() {
         return vmType;
     }
+
     public void setVmType(Integer vmType) {
         this.vmType = vmTypeArray[vmType];
     }
+
     public Integer getVmid() {
         return vmid;
     }
+
     public void setVmid(Integer vmid) {
         this.vmid = vmid;
     }
+
     public Integer getVmcpu() {
         return vmcpu;
     }
+
     public void setVmcpu(Integer vmcpu) {
         this.vmcpu = vmcpu;
     }
+
     public Integer getVmram() {
         return vmram;
     }
+
     public void setVmram(Integer vmram) {
         this.vmram = vmram;
     }
+    
     public void setVmOs(Integer vmOs) {
         this.vmOs = vmOsOptions[vmOs];
+    }
+
+    public String getVmOs() {
+        return vmOs;
+    }
+
+    public void setVmOs(String vmOs) {
+        this.vmOs = vmOs;
+    }
+
+    public Integer getAllocvmcpu() {
+        return allocvmcpu;
+    }
+
+    public void setAllocvmcpu(Integer allocvmcpu) {
+        this.allocvmcpu = allocvmcpu;
+    }
+
+    public Integer getAllocvmram() {
+        return allocvmram;
+    }
+
+    public void setAllocvmram(Integer allocvmram) {
+        this.allocvmram = allocvmram;
     }
 
 }

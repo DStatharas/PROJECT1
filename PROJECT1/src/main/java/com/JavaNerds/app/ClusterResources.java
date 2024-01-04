@@ -26,6 +26,7 @@ public class ClusterResources {
         return singleInstance;
     }
 
+    //Getters/Setters
     public static Integer getVmArrayLength() {
         return vmArray.size();
     }
@@ -70,5 +71,4 @@ public class ClusterResources {
         this.clbandwidth = clbandwidth;
     }
 
-    
 }
