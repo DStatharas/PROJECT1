@@ -244,24 +244,36 @@ public class Admin{
             userBandwidth = null;
 
             projectTools.clearConsole();
+            System.out.print("Enter number of CPU cores to assign or Q to cancel: ");
+            setProgramUserResource(userCpu);
+            if (exitCheck == true) {
+                continue;
+            }
+            
+            projectTools.clearConsole();
+            System.out.print("Enter number of GB of RAM to assign or Q to cancel: ");
+            setProgramUserResource(userRam);
+            if (exitCheck == true) {
+                continue;
+            }
 
-            setUserCPU();
+            projectTools.clearConsole();
+            System.out.print("Enter number of GB of SSD storage to assign or Q to cancel: ");
+            setProgramUserResource(userSsd);
             if (exitCheck == true) {
                 continue;
             }
-            setUserRAM();
+
+            projectTools.clearConsole();
+            System.out.print("Enter number of GPUs to assign or Q to cancel: ");
+            setProgramUserResource(userGpu);
             if (exitCheck == true) {
                 continue;
             }
-            setUserSSD();
-            if (exitCheck == true) {
-                continue;
-            }
-            setUserGpu();
-            if (exitCheck == true) {
-                continue;
-            }
-            setUserBandwidth();
+
+            projectTools.clearConsole();
+            System.out.print("Enter the amount of bandwidth rate to assign or Q to cancel: ");
+            setProgramUserResource(userBandwidth);
             if (exitCheck == true) {
                 continue;
             }
@@ -272,16 +284,11 @@ public class Admin{
             }
 
             //Panic!
-            adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
-            adminCluster.setClram(adminCluster.getClram()-userRam);
-            adminCluster.setClssd(adminCluster.getClssd()-userSsd);
-            adminCluster.setClgpu(adminCluster.getClgpu()-userGpu);
-            adminCluster.setClbandwidth(adminCluster.getClbandwidth()-userBandwidth);
 
             try {
-                projectTools.propellerLoading("Creating VM...", 5);
-                ClusterResources.vmArray.add(new VmNetworkedGPU(4, userOs, userCpu, userRam, userSsd, userGpu, userBandwidth));
-                System.out.println("VM created!");
+                projectTools.propellerLoading("Creating Program...", 5);
+                pArray.add(new Program(userCpu, userRam, userSsd, userGpu, userBandwidth, userExpectedTime));
+                System.out.println("Program created!");
                 Thread.sleep(3000);
             } catch (Exception e) {
                 projectTools.clearConsole();
@@ -1199,6 +1206,40 @@ public class Admin{
         }
     }
 
+    public void setProgramUserResource(Integer userResource) throws InterruptedException {
+        while (true) {
+            inputChecker = null;
+            userResource = null;
+            exitCheck = false;
+
+            inputChecker = oneScanner.next();
+            oneScanner.nextLine();
+
+            if (inputChecker.equalsIgnoreCase("q")) {
+                exitCheck = true;
+                break;
+            }
+            else {
+                try {
+                    userResource = Integer.parseInt(inputChecker);
+                } catch (Exception e) {
+                    projectTools.clearConsole();
+                    System.out.println("ERROR: Invalid input!");
+                    Thread.sleep(3000);
+                    continue;
+                }
+            }
+            if (userCpu < 0) {
+                projectTools.clearConsole();
+                System.out.println("ERROR: Resources cannot be negative!");
+                Thread.sleep(3000);
+                continue;
+            }
+
+            break;
+        }
+    }
+
     private void setUserExpectedTime() throws InterruptedException {
         while (true) {
             inputChecker = null;
@@ -1383,7 +1424,7 @@ public class Admin{
         }
     }
 
-    public void setProgramPriority() throws InterruptedException {
+    public void setAllProgramsPriority() throws InterruptedException {
         totalResCalc();
         
         for (Program e : pArray) {
@@ -1413,4 +1454,122 @@ public class Admin{
         pArray.sort(Comparator.comparing(Program::getPriority));
     }
 
+    public void assignProgramToBestVM(Program program) throws InterruptedException {
+        double minLoad = 1.0;
+        Integer minLoadVmId = 0;
+
+        for (VM vm : ClusterResources.vmArray) {
+            assignResources(program, vm);
+
+            if (vm.getVmLoad() > 1.0) {
+                deassignResources(program, vm);
+                projectTools.clearConsole();
+                System.out.println("ERROR: Program exceeds load limit!");
+                Thread.sleep(3000);
+                continue;
+            }
+
+            if (vm.getVmLoad() <= minLoad) {
+                if (vm.getVmLoad() < minLoad) {
+                    minLoad = vm.getVmLoad();
+                    minLoadVmId = vm.getVmid();
+                    deassignResources(program, vm);
+                    continue;
+                }
+                
+                if (vm.getVmLoad() == minLoad) {
+                    minLoad = vm.getVmLoad();
+                    minLoadVmId = vm.getVmid();
+                    deassignResources(program, vm);
+                    continue;
+                }
+            }
+
+        }
+
+        if (minLoadVmId == 0) {
+            projectTools.clearConsole();
+            System.out.println("ERROR: Program cannot be run by any VM!");
+            Thread.sleep(3000);
+            return;
+        }
+
+        assignResources(program, findVmById(minLoadVmId));
+        program.startExecutionTimer();
+    }
+
+    public void assignResources(Program program, VM vm) throws InterruptedException {
+        vm.setAllocvmcpu(vm.getAllocvmcpu()+program.getpCpu());
+        vm.setAllocvmram(vm.getAllocvmram()+program.getpRam());
+
+        switch (vm.vmType) {
+            case "PlainVM":
+                ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()+program.getpSsd());
+                break;
+            
+            case "VmGPU":
+                ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()+program.getpSsd());
+                ((VmGPU)vm).setAllocvmgpu(((VmGPU)vm).getAllocvmgpu()+program.getpGpu());
+                break;
+
+            case "VmNetworked":
+                ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()+program.getpSsd());
+                ((VmNetworked)vm).setAllocvmbandwidth(((VmNetworked)vm).getAllocvmbandwidth()+program.getpBandwidth());
+                break;
+
+            case "VmNetworkedGPU":
+                ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()+program.getpSsd());
+                ((VmGPU)vm).setAllocvmgpu(((VmGPU)vm).getAllocvmgpu()+program.getpGpu());
+                ((VmNetworkedGPU)vm).setAllocvmbandwidth(((VmNetworkedGPU)vm).getAllocvmbandwidth()+program.getpBandwidth());
+                break;
+
+            default:
+                projectTools.clearConsole();
+                System.out.println("ERROR: Could not assign resources!");
+                Thread.sleep(3000);
+                break;
+        }
+    }
+
+    public void deassignResources(Program program, VM vm) throws InterruptedException {
+        vm.setAllocvmcpu(vm.getAllocvmcpu()-program.getpCpu());
+        vm.setAllocvmram(vm.getAllocvmram()-program.getpRam());
+
+        switch (vm.vmType) {
+            case "PlainVM":
+                ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()-program.getpSsd());
+                break;
+            
+            case "VmGPU":
+                ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()-program.getpSsd());
+                ((VmGPU)vm).setAllocvmgpu(((VmGPU)vm).getAllocvmgpu()-program.getpGpu());
+                break;
+
+            case "VmNetworked":
+                ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()-program.getpSsd());
+                ((VmNetworked)vm).setAllocvmbandwidth(((VmNetworked)vm).getAllocvmbandwidth()-program.getpBandwidth());
+                break;
+
+            case "VmNetworkedGPU":
+                ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()-program.getpSsd());
+                ((VmGPU)vm).setAllocvmgpu(((VmGPU)vm).getAllocvmgpu()-program.getpGpu());
+                ((VmNetworkedGPU)vm).setAllocvmbandwidth(((VmNetworkedGPU)vm).getAllocvmbandwidth()-program.getpBandwidth());
+                break;
+
+            default:
+                projectTools.clearConsole();
+                System.out.println("ERROR: Could not deassign resources!");
+                Thread.sleep(3000);
+                break;
+        }
+    }
+
+    public Program findProgramById(Integer pId) {
+        for (Program program : pArray) {
+            if (program.getpId().equals(pId)) {
+                return program;
+            }
+        }
+        return new Program(0, 0, 0, 0, 0, 0);
+    }
 }
