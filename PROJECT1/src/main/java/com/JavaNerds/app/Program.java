@@ -1,12 +1,8 @@
 package com.JavaNerds.app;
 
-import java.util.Random;
-
 public class Program {
-
-    Random rand = new Random();
     
-    private Integer pId = rand.nextInt(1, 999);
+    private Integer pId;
     private Integer pCpu = 0;
     private Integer pRam = 0;
     private Integer pSsd = 0;
@@ -16,14 +12,18 @@ public class Program {
     private long startExecTime = 0;
     private long executionTime = 0;
     private Double priority = 0.0;
+    private Integer runCounter = 0;
 
-    public Program(Integer pCpu, Integer pRam, Integer pSsd, Integer pGpu, Integer pBandwidth, Integer expectedTime) {
+
+    public Program(Integer pCpu, Integer pRam, Integer pSsd, Integer pGpu, Integer pBandwidth, Integer expectedTime, Integer pId, Double priority) {
            this.pCpu = pCpu;
            this.pRam = pRam;
            this.pSsd = pSsd;
            this.pGpu = pGpu;
            this.pBandwidth = pBandwidth;
            this.expectedTime = expectedTime;
+           this.pId = pId;
+           this.priority = priority;
     }
 
     public void startExecutionTimer() {
@@ -46,6 +46,15 @@ public class Program {
     }
 
     //Getters/Setters
+
+    public Integer getRunCounter() {
+        return runCounter;
+    }
+
+    public void setRunCounter(Integer runCounter) {
+        this.runCounter = runCounter;
+    }
+    
     public Integer getpCpu() {
         return pCpu;
     }

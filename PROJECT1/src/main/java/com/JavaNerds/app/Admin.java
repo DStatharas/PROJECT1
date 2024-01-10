@@ -1,8 +1,11 @@
 package com.JavaNerds.app;
 
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class Admin{
 
@@ -25,10 +28,12 @@ public class Admin{
     private Integer totalSsd = 0;
     private Integer totalGpu = 0;
     private Integer totalBandwidth = 0;
+    private Boolean assignCheck = false;
 
     private Integer userPChoice = null;
-    public ArrayList<Program> pArray = new ArrayList<>();
-
+    public SortedSet<Program> pSet = new TreeSet<Program>(Comparator.comparing(Program::getPriority));
+    public LinkedList<Program> pQueue = new LinkedList<Program>();
+    
 
     public void createVM() throws InterruptedException {
         Integer userVmType = null;
@@ -198,7 +203,7 @@ public class Admin{
 
             projectTools.clearConsole();
 
-            System.out.print("Please select one of the following options:\n "+"\n\n"+"1: Create program"+"\n"+"2: VM Report"+"\n"+"0: Quit");
+            System.out.print("Please select one of the following options:\n "+"\n\n"+"1: Create program"+"\n"+"2: VM Report"+"3: Assign and run programs"+"\n"+"0: Quit");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
             try {
@@ -213,11 +218,15 @@ public class Admin{
             switch (userPChoice) {
                 case 1:
                     createProgram();
-                    break;
+                    continue;
                 
                 case 2:
                     reportVm();
                     continue;
+                
+                case 3:
+                    
+                    break;
 
                 case 0:
                     break;
@@ -237,11 +246,11 @@ public class Admin{
             inputChecker = null;
             exitCheck = false;
             userPChoice = null;
-            userCpu = null;
-            userRam = null;
-            userSsd = null;
-            userGpu = null;
-            userBandwidth = null;
+            userCpu = 0;
+            userRam = 0;
+            userSsd = 0;
+            userGpu = 0;
+            userBandwidth = 0;
 
             projectTools.clearConsole();
             System.out.print("Enter number of CPU cores to assign or Q to cancel: ");
@@ -287,12 +296,12 @@ public class Admin{
 
             try {
                 projectTools.propellerLoading("Creating Program...", 5);
-                pArray.add(new Program(userCpu, userRam, userSsd, userGpu, userBandwidth, userExpectedTime));
+                pSet.add(new Program(userCpu, userRam, userSsd, userGpu, userBandwidth, userExpectedTime, pIdCheckProvider(), createPriorityUsingUserResource()));
                 System.out.println("Program created!");
                 Thread.sleep(3000);
             } catch (Exception e) {
                 projectTools.clearConsole();
-                System.out.println("ERROR: VM could not be created!");
+                System.out.println("ERROR: Program could not be created!");
                 Thread.sleep(3000);
                 continue;
             }
@@ -1209,7 +1218,7 @@ public class Admin{
     public void setProgramUserResource(Integer userResource) throws InterruptedException {
         while (true) {
             inputChecker = null;
-            userResource = null;
+            userResource = 0;
             exitCheck = false;
 
             inputChecker = oneScanner.next();
@@ -1427,7 +1436,7 @@ public class Admin{
     public void setAllProgramsPriority() throws InterruptedException {
         totalResCalc();
         
-        for (Program e : pArray) {
+        for (Program e : pSet) {
             if (totalCpu != 0) {
                 e.setPriority(e.getPriority()+(e.getpCpu()/totalCpu));
             }
@@ -1450,8 +1459,32 @@ public class Admin{
         }
     }
 
-    public void sortProgramArrayPriority() {
-        pArray.sort(Comparator.comparing(Program::getPriority));
+    public Double createPriorityUsingUserResource() throws InterruptedException {
+        totalResCalc();
+        
+        Double priority = 0.0;
+
+        if (totalCpu != 0 && userCpu != 0) {
+            priority += userCpu/totalCpu;
+        }
+
+        if (totalRam != 0 && userRam != 0) {
+            priority += userRam/totalRam;
+        }
+
+        if (totalSsd != 0 && userSsd != 0) {
+            priority += userSsd/totalSsd;
+        }
+
+        if (totalGpu != 0 && userGpu != 0) {
+            priority += userGpu/totalGpu;
+        }
+
+        if (totalBandwidth != 0 && userBandwidth != 0) {
+            priority += userBandwidth/totalBandwidth;
+        }
+
+        return priority;
     }
 
     public void assignProgramToBestVM(Program program) throws InterruptedException {
@@ -1463,9 +1496,6 @@ public class Admin{
 
             if (vm.getVmLoad() > 1.0) {
                 deassignResources(program, vm);
-                projectTools.clearConsole();
-                System.out.println("ERROR: Program exceeds load limit!");
-                Thread.sleep(3000);
                 continue;
             }
 
@@ -1491,11 +1521,14 @@ public class Admin{
             projectTools.clearConsole();
             System.out.println("ERROR: Program cannot be run by any VM!");
             Thread.sleep(3000);
+            program.setRunCounter(program.getRunCounter()+1);
+            assignCheck = false;
             return;
         }
 
         assignResources(program, findVmById(minLoadVmId));
         program.startExecutionTimer();
+        assignCheck = true;
     }
 
     public void assignResources(Program program, VM vm) throws InterruptedException {
@@ -1565,11 +1598,38 @@ public class Admin{
     }
 
     public Program findProgramById(Integer pId) {
-        for (Program program : pArray) {
+        for (Program program : pSet) {
             if (program.getpId().equals(pId)) {
                 return program;
             }
         }
-        return new Program(0, 0, 0, 0, 0, 0);
+
+        return new Program(0, 0, 0, 0, 0, 0, 0, 0.0);
     }
+
+    public Integer pIdCheckProvider() {
+        //edge case: 999 programs in pArray
+        Random rand = new Random();
+        Integer id = 0;
+        do {
+            id = rand.nextInt(1, 999);
+        } while (pSet.contains(findProgramById(id)));
+        
+        return id;
+    }
+
+    public void queueProgramsByPriority() {
+        for (Program program : pSet) {
+            pQueue.add(program);
+        }
+    }
+
+    public void queuePopperNameInTheWorks() throws InterruptedException{
+        assignProgramToBestVM(pQueue.peek());
+        if (assignCheck == false) {
+            pQueue.offerLast(pQueue.pollFirst());
+        }
+        
+    }
+
 }
