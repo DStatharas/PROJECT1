@@ -1,6 +1,8 @@
 package com.JavaNerds.app;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
@@ -29,11 +31,14 @@ public class Admin{
     private Integer totalGpu = 0;
     private Integer totalBandwidth = 0;
     private Boolean assignCheck = false;
+    private Boolean pEndCheck = false;
 
     private Integer userPChoice = null;
     public SortedSet<Program> pSet = new TreeSet<Program>(Comparator.comparing(Program::getPriority));
     public LinkedList<Program> pQueue = new LinkedList<Program>();
-    
+    public ArrayList<Program> runningPrograms = new ArrayList<Program>();
+    public ArrayList<Program> completedPrograms = new ArrayList<Program>();
+    public ArrayList<Program> failedPrograms = new ArrayList<Program>();
 
     public void createVM() throws InterruptedException {
         Integer userVmType = null;
@@ -197,13 +202,21 @@ public class Admin{
     }
     
     public void programMenu() throws InterruptedException {
-        while (true) {
+            pSet.clear();
+            pQueue.clear();
+            runningPrograms.clear();
+            completedPrograms.clear();
+            failedPrograms.clear();
+
+        prloop: while (true) {
             inputChecker = null;
             userPChoice = null;
+            
+
 
             projectTools.clearConsole();
 
-            System.out.print("Please select one of the following options:\n "+"\n\n"+"1: Create program"+"\n"+"2: VM Report"+"3: Assign and run programs"+"\n"+"0: Quit");
+            System.out.print("Please select one of the following options:\n "+"\n\n"+"1: Create program"+"\n"+"2: VM Report\n"+"3: Program Report\n"+"4: Auto-assign and run programs"+"\n"+"0: Quit"+"\n\n"+"Select option: ");
             inputChecker = oneScanner.next();
             oneScanner.nextLine();
             try {
@@ -225,11 +238,40 @@ public class Admin{
                     continue;
                 
                 case 3:
-                    
-                    break;
+                    reportAllPrograms();
+                    continue;
+
+                case 4:
+                    if (pSet.isEmpty()) {
+                        projectTools.colorFlasher("No programs have been created!", 5, 350, ConsoleColors.RED);
+                        continue prloop;
+                    }
+
+                    mainProgramRunManager();
+
+                    pSet.clear();
+                    pQueue.clear();
+                    runningPrograms.clear();
+                    completedPrograms.clear();
+                    failedPrograms.clear();
+                    continue prloop;
 
                 case 0:
-                    break;
+                    inputChecker = null;
+                    System.out.print("Are you sure you want to quit? All unsaved changes will be lost!\nY/N: ");
+                    try {
+                        inputChecker = oneScanner.next();
+                        oneScanner.nextLine();
+                    } catch (Exception e) {
+                        continue;
+                    }
+                    if (inputChecker.equalsIgnoreCase("y")) {
+                        projectTools.propellerLoading("\n\n   Terminating Application..." , 10);
+                        break prloop;
+                    }
+                    else {
+                        continue;
+                    }
 
                 default:
                     projectTools.clearConsole();
@@ -254,45 +296,43 @@ public class Admin{
 
             projectTools.clearConsole();
             System.out.print("Enter number of CPU cores to assign or Q to cancel: ");
-            setProgramUserResource(userCpu);
+            userCpu = setProgramUserResource();
             if (exitCheck == true) {
-                continue;
+                break;
             }
             
             projectTools.clearConsole();
             System.out.print("Enter number of GB of RAM to assign or Q to cancel: ");
-            setProgramUserResource(userRam);
+            userRam = setProgramUserResource();
             if (exitCheck == true) {
-                continue;
+                break;
             }
 
             projectTools.clearConsole();
             System.out.print("Enter number of GB of SSD storage to assign or Q to cancel: ");
-            setProgramUserResource(userSsd);
+            userSsd = setProgramUserResource();
             if (exitCheck == true) {
-                continue;
+                break;
             }
 
             projectTools.clearConsole();
             System.out.print("Enter number of GPUs to assign or Q to cancel: ");
-            setProgramUserResource(userGpu);
+            userGpu = setProgramUserResource();
             if (exitCheck == true) {
-                continue;
+                break;
             }
 
             projectTools.clearConsole();
             System.out.print("Enter the amount of bandwidth rate to assign or Q to cancel: ");
-            setProgramUserResource(userBandwidth);
+            userBandwidth = setProgramUserResource();
             if (exitCheck == true) {
-                continue;
+                break;
             }
 
             setUserExpectedTime();
             if (exitCheck == true) {
-                continue;
+                break;
             }
-
-            //Panic!
 
             try {
                 projectTools.propellerLoading("Creating Program...", 5);
@@ -1215,10 +1255,10 @@ public class Admin{
         }
     }
 
-    public void setProgramUserResource(Integer userResource) throws InterruptedException {
+    public Integer setProgramUserResource() throws InterruptedException {
+        Integer userResource = 0;
         while (true) {
             inputChecker = null;
-            userResource = 0;
             exitCheck = false;
 
             inputChecker = oneScanner.next();
@@ -1226,7 +1266,7 @@ public class Admin{
 
             if (inputChecker.equalsIgnoreCase("q")) {
                 exitCheck = true;
-                break;
+                return 0;
             }
             else {
                 try {
@@ -1238,14 +1278,14 @@ public class Admin{
                     continue;
                 }
             }
-            if (userCpu < 0) {
+            if (userResource < 0) {
                 projectTools.clearConsole();
                 System.out.println("ERROR: Resources cannot be negative!");
                 Thread.sleep(3000);
                 continue;
             }
 
-            break;
+            return userResource;
         }
     }
 
@@ -1398,6 +1438,27 @@ public class Admin{
             }
     }
 
+    public void reportAllPrograms() throws InterruptedException {
+        projectTools.clearConsole();
+        System.out.println("------------------------\n  Total Program Report\n------------------------\n\n");
+        for (Program program : pSet) {
+            try {
+                program.printProgramReport();
+                System.out.println("\n------------------------------");
+                System.out.println("\n");
+            } catch (Exception e) {
+                projectTools.clearConsole();
+                System.out.println("ERROR: Cannot print Program(s)!");
+                Thread.sleep(3000);
+                break;
+            }
+        }
+        
+        System.out.print("Press Enter to continue...");
+        oneScanner.nextLine();
+        
+    }
+
     public void displayVmArray() {
         System.out.println("-- ~Currently active Virtual Machines~ --");
         if (ClusterResources.vmArray.isEmpty()) {
@@ -1511,16 +1572,12 @@ public class Admin{
                     minLoad = vm.getVmLoad();
                     minLoadVmId = vm.getVmid();
                     deassignResources(program, vm);
-                    continue;
+                   continue;
                 }
             }
-
         }
 
         if (minLoadVmId == 0) {
-            projectTools.clearConsole();
-            System.out.println("ERROR: Program cannot be run by any VM!");
-            Thread.sleep(3000);
             program.setRunCounter(program.getRunCounter()+1);
             assignCheck = false;
             return;
@@ -1528,6 +1585,9 @@ public class Admin{
 
         assignResources(program, findVmById(minLoadVmId));
         program.startExecutionTimer();
+        findVmById(minLoadVmId).programAssignArray.add(program);
+        runningPrograms.add(program);
+        pQueue.remove(program);
         assignCheck = true;
     }
 
@@ -1612,7 +1672,7 @@ public class Admin{
         Random rand = new Random();
         Integer id = 0;
         do {
-            id = rand.nextInt(1, 999);
+            id = rand.nextInt(1, 1000);
         } while (pSet.contains(findProgramById(id)));
         
         return id;
@@ -1624,12 +1684,77 @@ public class Admin{
         }
     }
 
-    public void queuePopperNameInTheWorks() throws InterruptedException{
-        assignProgramToBestVM(pQueue.peek());
-        if (assignCheck == false) {
-            pQueue.offerLast(pQueue.pollFirst());
+    public void mainProgramRunManager() throws InterruptedException{
+        projectTools.clearConsole();
+        queueProgramsByPriority();
+
+        while (pEndCheck == false) {
+            assignCheck = true;
+            projectTools.clearConsole();
+
+
+            //this does not de-assign from VM
+            for (Iterator<Program> iterator = runningPrograms.iterator(); iterator.hasNext();) {
+                Program p = iterator.next();
+                if (checkProgramRuntimeForDeletion(p) == true) {
+                    completedPrograms.add(p);
+                    iterator.remove();
+                }
+            }
+            
+            if (pQueue.isEmpty() == false) {
+                assignProgramToBestVM(pQueue.getFirst());
+            }
+                
+            if (assignCheck == false) {
+                if (pQueue.getFirst().getRunCounter() > 3) {
+                    failedPrograms.add(pQueue.getFirst());
+                    pQueue.removeFirst();
+                }
+                else {
+                    pQueue.addLast(pQueue.removeFirst());
+                }
+            }
+
+            for (VM vm : ClusterResources.vmArray) {
+                printVmWithPrograms(vm);
+            }
+
+            Thread.sleep(1000);
+
+            if (pQueue.isEmpty() && runningPrograms.isEmpty()) {
+                System.out.println("Programs finished! Type "+"Q "+"to continue. ");
+                inputChecker = oneScanner.next();
+                oneScanner.nextLine();
+                if (inputChecker.equalsIgnoreCase("q")) {
+                    return;
+                }
+            }
+        }
+    }
+
+    public void removeProgramFromVMOnTimeOut(Program program, VM vm) throws InterruptedException{
+        if (checkProgramRuntimeForDeletion(program) == false) {
+            return;
         }
         
+        deassignResources(program , vm);
+        vm.programAssignArray.remove(program);
+    }
+
+    public Boolean checkProgramRuntimeForDeletion(Program program){
+        if (program.getExecutionTimeInSeconds() >= program.getExpectedTime()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void printVmWithPrograms(VM vm) {
+        vm.printVmReport();
+        for (Program program : vm.programAssignArray) {
+            program.printProgramRunningReport();
+        }
     }
 
 }

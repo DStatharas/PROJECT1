@@ -3,16 +3,16 @@ package com.JavaNerds.app;
 public class Program {
     
     private Integer pId;
-    private Integer pCpu = 0;
-    private Integer pRam = 0;
-    private Integer pSsd = 0;
-    private Integer pGpu = 0;
-    private Integer pBandwidth = 0;
-    private Integer expectedTime = null;
-    private long startExecTime = 0;
-    private long executionTime = 0;
-    private Double priority = 0.0;
-    private Integer runCounter = 0;
+    private Integer pCpu          = 0;
+    private Integer pRam          = 0;
+    private Integer pSsd          = 0;
+    private Integer pGpu          = 0;
+    private Integer pBandwidth    = 0;
+    private Integer expectedTime  = null;
+    private long    startExecTime = 0;
+    private long    executionTime = 0;
+    private Double  priority      = 0.0;
+    private Integer runCounter    = 0;
 
 
     public Program(Integer pCpu, Integer pRam, Integer pSsd, Integer pGpu, Integer pBandwidth, Integer expectedTime, Integer pId, Double priority) {
@@ -31,16 +31,24 @@ public class Program {
     }
 
     public void printProgramReport() {
-        System.out.print("----- ~<Program "+this.pId+">~ -----"+"\n");
+        System.out.print("------ ~<Program #"+this.pId+">~ ------"+"\n");
         System.out.print("CPU Cores: "+this.pCpu+"\n");
         System.out.print("RAM: "+this.pRam+" GB"+"\n");
-        System.out.print("SSD: "+this.pSsd+" GB"+"\n"); 
+        System.out.print("SSD: "+this.pSsd+" GB"+"\n");
         if (this.pGpu > 0) {
             System.out.print("GPUs: "+this.pGpu+"\n");
         }
         if (this.pBandwidth > 0) {
             System.out.println("Bandwidth: "+this.pBandwidth+" Gb/sec"+"\n");
         }
+        System.out.println("Expected Execution Time: "+this.expectedTime+"sec");
+        System.out.println("------------------------------");
+    }
+
+    public void printProgramRunningReport(){
+        System.out.print("|\n");
+        System.out.print("----- ~<Program "+this.pId+">~ -----"+"\n");
+        System.out.println("Uptime: "+getExecutionTimeInSeconds()+"sec");
         System.out.println("Expected Execution Time: "+this.expectedTime+"sec\n");
         System.out.println("--------------");
     }
@@ -54,7 +62,7 @@ public class Program {
     public void setRunCounter(Integer runCounter) {
         this.runCounter = runCounter;
     }
-    
+
     public Integer getpCpu() {
         return pCpu;
     }

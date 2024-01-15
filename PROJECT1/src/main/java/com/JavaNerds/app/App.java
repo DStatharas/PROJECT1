@@ -34,7 +34,7 @@ public class App
             ConsoleColors.reset();
 
             System.out.println("Please select one of the following options:\n");
-            System.out.println("1: Create new Virtual Machine\n2: Update an existing Virtual Machine\n3: Delete a Virtual Machine\n4: Receive a report on a Virtual Machine's available resources\n0: Terminate Application\n");
+            System.out.println("1: Create new Virtual Machine\n2: Update an existing Virtual Machine\n3: Delete a Virtual Machine\n4: Receive a report on a Virtual Machine's available resources\n5: Create and run programs\n0: Terminate Application\n");
             System.out.print("Select option: ");
             try {
                 intChecker = Integer.parseInt(oneScanner.next());
@@ -78,7 +78,16 @@ public class App
                 case 4:
                     mainAdminInstance.reportVm();
                     break;
-                    
+
+                case 5:
+                    if (ClusterResources.vmArray.isEmpty()) {
+                        projectTools.colorFlasher("Programs need at least one VM to run!", 5, 350, ConsoleColors.RED);
+                        continue;
+                    }
+
+                    mainAdminInstance.programMenu();
+                    return;
+
                 default:
                     projectTools.clearConsole();
                     System.out.println();

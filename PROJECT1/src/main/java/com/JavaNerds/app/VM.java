@@ -15,13 +15,15 @@ abstract class VM{
 
     protected String[] vmOsOptions = {"WINDOWS", "UBUNTU", "FEDORA"};
 
-    protected Integer allocvmcpu = 2;
-    protected Integer allocvmram = 4;
+    protected Integer allocvmcpu = 0;
+    protected Integer allocvmram = 0;
 
     protected ArrayList<String> vmReportAvailableArray = new ArrayList<>();
     protected ArrayList<String> vmReportAllocatedArray = new ArrayList<>();
 
     protected double vmLoad = 0.0;
+
+    protected ArrayList<Program> programAssignArray = new ArrayList<Program>();
 
     public VM(Integer vmType, Integer vmOs, Integer vmcpu, Integer vmram) {
         this.vmid = vmIdGen;
@@ -55,6 +57,7 @@ abstract class VM{
         for (String e : vmReportAllocatedArray) {
             System.out.print(e);
         }
+        printLoad();
     }
 
     public void calculateVmLoad() {
@@ -75,8 +78,9 @@ abstract class VM{
     }
 
     public void printLoad() {
+        System.out.print("VM load: ");
         System.out.format("%.0f",vmLoad);
-        System.out.print("%");
+        System.out.print("%"+"\n");
     }
 
     //Getters/Setters
