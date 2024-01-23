@@ -43,7 +43,7 @@ public class App
                 projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                 continue;
             }
-                
+            
 
             switch (intChecker) {
                 case 0:

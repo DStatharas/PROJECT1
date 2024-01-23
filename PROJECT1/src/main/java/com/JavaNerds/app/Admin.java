@@ -1,13 +1,13 @@
 package com.JavaNerds.app;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class Admin{
 
@@ -34,7 +34,7 @@ public class Admin{
     private Boolean pEndCheck = false;
 
     private Integer userPChoice = null;
-    public SortedSet<Program> pSet = new TreeSet<Program>(Comparator.comparing(Program::getPriority));
+    public HashSet<Program> pSet = new HashSet<Program>();
     public LinkedList<Program> pQueue = new LinkedList<Program>();
     public ArrayList<Program> runningPrograms = new ArrayList<Program>();
     public ArrayList<Program> completedPrograms = new ArrayList<Program>();
@@ -98,7 +98,7 @@ public class Admin{
                     
                     break;
 
-                    
+
                 case 2:
                     //VmGPU
                     setUserOCRS();
@@ -211,7 +211,7 @@ public class Admin{
         prloop: while (true) {
             inputChecker = null;
             userPChoice = null;
-            
+
 
 
             projectTools.clearConsole();
@@ -1444,7 +1444,6 @@ public class Admin{
         for (Program program : pSet) {
             try {
                 program.printProgramReport();
-                System.out.println("\n------------------------------");
                 System.out.println("\n");
             } catch (Exception e) {
                 projectTools.clearConsole();
@@ -1523,26 +1522,26 @@ public class Admin{
     public Double createPriorityUsingUserResource() throws InterruptedException {
         totalResCalc();
         
-        Double priority = 0.0;
+        Double priority = 0.00;
 
         if (totalCpu != 0 && userCpu != 0) {
-            priority += userCpu/totalCpu;
+            priority += ((double)userCpu)/totalCpu;
         }
 
         if (totalRam != 0 && userRam != 0) {
-            priority += userRam/totalRam;
+            priority += ((double)userRam)/totalRam;
         }
 
         if (totalSsd != 0 && userSsd != 0) {
-            priority += userSsd/totalSsd;
+            priority += ((double)userSsd)/totalSsd;
         }
 
         if (totalGpu != 0 && userGpu != 0) {
-            priority += userGpu/totalGpu;
+            priority += ((double)userGpu)/totalGpu;
         }
 
         if (totalBandwidth != 0 && userBandwidth != 0) {
-            priority += userBandwidth/totalBandwidth;
+            priority += ((double)userBandwidth)/totalBandwidth;
         }
 
         return priority;
@@ -1553,6 +1552,18 @@ public class Admin{
         Integer minLoadVmId = 0;
 
         for (VM vm : ClusterResources.vmArray) {
+            if (program.getpGpu() > 0 && (vm.vmType != "VmGPU" || vm.vmType != "VmNetworkedGPU")) {
+                program.setRunCounter(program.getRunCounter()+1);
+                assignCheck = false;
+                continue;
+            }
+
+            if (program.getpBandwidth() > 0 && (vm.vmType != "VmNetworked" || vm.vmType != "VmNetworkedGPU")) {
+                program.setRunCounter(program.getRunCounter()+1);
+                assignCheck = false;
+                continue;
+            }
+
             assignResources(program, vm);
 
             if (vm.getVmLoad() > 1.0) {
@@ -1572,7 +1583,7 @@ public class Admin{
                     minLoad = vm.getVmLoad();
                     minLoadVmId = vm.getVmid();
                     deassignResources(program, vm);
-                   continue;
+                    continue;
                 }
             }
         }
@@ -1583,9 +1594,12 @@ public class Admin{
             return;
         }
 
+        
         assignResources(program, findVmById(minLoadVmId));
+        findVmById(minLoadVmId).calculateVmLoad();
         program.startExecutionTimer();
         findVmById(minLoadVmId).programAssignArray.add(program);
+        program.setAssignedVm(minLoadVmId);
         runningPrograms.add(program);
         pQueue.remove(program);
         assignCheck = true;
@@ -1659,7 +1673,7 @@ public class Admin{
 
     public Program findProgramById(Integer pId) {
         for (Program program : pSet) {
-            if (program.getpId().equals(pId)) {
+            if (program.getpId() == pId) {
                 return program;
             }
         }
@@ -1671,10 +1685,11 @@ public class Admin{
         //edge case: 999 programs in pArray
         Random rand = new Random();
         Integer id = 0;
-        do {
-            id = rand.nextInt(1, 1000);
-        } while (pSet.contains(findProgramById(id)));
         
+        do {
+            id = rand.nextInt(1, 999);
+        } while (pSet.contains(findProgramById(id)));
+
         return id;
     }
 
@@ -1682,30 +1697,29 @@ public class Admin{
         for (Program program : pSet) {
             pQueue.add(program);
         }
+
+        Collections.sort(pQueue , new Comparator<Program>() {
+            @Override
+            public int compare(Program a, Program b) {
+                return a.getPriority().compareTo(b.getPriority());
+            }
+        });
     }
 
     public void mainProgramRunManager() throws InterruptedException{
         projectTools.clearConsole();
         queueProgramsByPriority();
 
+
+
         while (pEndCheck == false) {
             assignCheck = true;
             projectTools.clearConsole();
-
-
-            //this does not de-assign from VM
-            for (Iterator<Program> iterator = runningPrograms.iterator(); iterator.hasNext();) {
-                Program p = iterator.next();
-                if (checkProgramRuntimeForDeletion(p) == true) {
-                    completedPrograms.add(p);
-                    iterator.remove();
-                }
-            }
             
             if (pQueue.isEmpty() == false) {
                 assignProgramToBestVM(pQueue.getFirst());
             }
-                
+            
             if (assignCheck == false) {
                 if (pQueue.getFirst().getRunCounter() > 3) {
                     failedPrograms.add(pQueue.getFirst());
@@ -1716,14 +1730,26 @@ public class Admin{
                 }
             }
 
+            for (Iterator<Program> iterator = runningPrograms.iterator(); iterator.hasNext();) {
+                Program p = iterator.next();
+                if (checkProgramRuntimeForDeletion(p) == true) {
+                    removeProgramFromVMOnTimeOut(p, findVmById(p.getAssignedVm()));
+                    p.setAssignedVm(0);
+                    completedPrograms.add(p);
+                    iterator.remove();
+                }
+            }
+
             for (VM vm : ClusterResources.vmArray) {
                 printVmWithPrograms(vm);
+                System.out.println("\n\n");
             }
 
             Thread.sleep(1000);
 
             if (pQueue.isEmpty() && runningPrograms.isEmpty()) {
-                System.out.println("Programs finished! Type "+"Q "+"to continue. ");
+                projectTools.clearConsole();
+                System.out.println("\n\nPrograms finished! Type "+"Q "+"to continue. ");
                 inputChecker = oneScanner.next();
                 oneScanner.nextLine();
                 if (inputChecker.equalsIgnoreCase("q")) {

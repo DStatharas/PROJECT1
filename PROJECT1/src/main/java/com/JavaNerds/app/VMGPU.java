@@ -30,20 +30,20 @@ public class VmGPU extends PlainVM{
         double ssdDiv;
         double gpuDiv;
 
-        a = this.vmcpu;
-        b = this.allocvmcpu;
+        a = ((double)this.vmcpu);
+        b = ((double)this.allocvmcpu);
         cpuDiv = b/a;
-        
-        a = this.vmram;
-        b = this.allocvmram;
+
+        a = ((double)this.vmram);
+        b = ((double)this.allocvmram);
         ramDiv = b/a;
 
-        a = this.vmssd;
-        b = this.allocvmssd;
+        a = ((double)this.vmssd);
+        b = ((double)this.allocvmssd);
         ssdDiv = b/a;
 
-        a = this.vmgpu;
-        b = this.allocvmgpu;
+        a = ((double)this.vmgpu);
+        b = ((double)this.allocvmgpu);
         gpuDiv = b/a;
 
         this.vmLoad = (cpuDiv+ramDiv+ssdDiv+gpuDiv)/4;

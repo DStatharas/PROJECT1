@@ -21,7 +21,7 @@ abstract class VM{
     protected ArrayList<String> vmReportAvailableArray = new ArrayList<>();
     protected ArrayList<String> vmReportAllocatedArray = new ArrayList<>();
 
-    protected double vmLoad = 0.0;
+    protected double vmLoad = 0.00;
 
     protected ArrayList<Program> programAssignArray = new ArrayList<Program>();
 
@@ -58,6 +58,7 @@ abstract class VM{
             System.out.print(e);
         }
         printLoad();
+        System.out.print("-------------------");
     }
 
     public void calculateVmLoad() {
@@ -66,12 +67,12 @@ abstract class VM{
         double cpuDiv;
         double ramDiv;
 
-        a = this.vmcpu;
-        b = this.allocvmcpu;
+        a = ((double)this.vmcpu);
+        b = ((double)this.allocvmcpu);
         cpuDiv = b/a;
 
-        a = this.vmram;
-        b = this.allocvmram;
+        a = ((double)this.vmram);
+        b = ((double)this.allocvmram);
         ramDiv = b/a;
 
         this.vmLoad = (cpuDiv+ramDiv)/2;
@@ -79,8 +80,8 @@ abstract class VM{
 
     public void printLoad() {
         System.out.print("VM load: ");
-        System.out.format("%.0f",vmLoad);
-        System.out.print("%"+"\n");
+        System.out.format("%.0f%%",100 * this.vmLoad);
+        System.out.print("\n");
     }
 
     //Getters/Setters
