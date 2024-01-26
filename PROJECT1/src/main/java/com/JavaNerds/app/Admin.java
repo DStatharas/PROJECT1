@@ -1,5 +1,6 @@
 package com.JavaNerds.app;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -9,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -1794,6 +1796,154 @@ public class Admin{
         ObjectOutputStream oos = new ObjectOutputStream(fout);
         oos.writeObject(failedPrograms);
         oos.close();
+    }
+
+    public void readVmsConfig() throws IOException{
+        String configFilePath = "./cfg/vms.config";
+        FileInputStream propsInput = new FileInputStream(configFilePath);
+        Properties prop = new Properties();
+        prop.load(propsInput);
+    }
+
+    public void autoCreateVms() throws InterruptedException{
+        Integer cfgVmType = null;
+
+        Integer cfgCpu = null;
+        Integer cfgRam = null;
+        Integer cfgSsd = null;
+        Integer cfgGpu = null;
+        Integer cfgBandwidth = null;
+        String cfgOs = null;
+
+        while (true) {
+            
+
+            switch (cfgVmType) {
+                case 1:
+                    //PlainVM
+                    setUserOCRS();
+                    if (exitCheck == true) {
+                        continue;
+                    }
+                    adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
+                    adminCluster.setClram(adminCluster.getClram()-userRam);
+                    adminCluster.setClssd(adminCluster.getClssd()-userSsd);
+
+                    try {
+                        projectTools.propellerLoading("Creating VM...", 5);
+                        ClusterResources.vmArray.add(new PlainVM(1, userOs, userCpu, userRam, userSsd));
+                        System.out.println("VM created!");
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: VM could not be created!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
+                    
+                    break;
+
+
+                case 2:
+                    //VmGPU
+                    setUserOCRS();
+                    if (exitCheck == true) {
+                        continue;
+                    }
+                    setUserGpu();
+                    if (exitCheck == true) {
+                        continue;
+                    }
+
+                    adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
+                    adminCluster.setClram(adminCluster.getClram()-userRam);
+                    adminCluster.setClssd(adminCluster.getClssd()-userSsd);
+                    adminCluster.setClgpu(adminCluster.getClgpu()-userGpu);
+
+                    try {
+                        projectTools.propellerLoading("Creating VM...", 5);
+                        ClusterResources.vmArray.add(new VmGPU(2, userOs, userCpu, userRam, userSsd, userGpu));
+                        System.out.println("VM created!");
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: VM could not be created!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
+                    break;
+
+                case 3:
+                    //VmNetworked
+                    setUserOCRS();
+                    if (exitCheck == true) {
+                        continue;
+                    }
+                    setUserBandwidth();
+                    if (exitCheck == true) {
+                        continue;
+                    }
+
+                    adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
+                    adminCluster.setClram(adminCluster.getClram()-userRam);
+                    adminCluster.setClssd(adminCluster.getClssd()-userSsd);
+                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()-userBandwidth);
+
+                    try {
+                        projectTools.propellerLoading("Creating VM...", 5);
+                        ClusterResources.vmArray.add(new VmNetworked(3, userOs, userCpu, userRam, userSsd, userBandwidth));
+                        System.out.println("VM created!");
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: VM could not be created!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
+                    break;
+
+                case 4:
+                    //VmNetworkedGPU
+                    setUserOCRS();
+                    if (exitCheck == true) {
+                        continue;
+                    }
+                    setUserGpu();
+                    if (exitCheck == true) {
+                        continue;
+                    }
+                    setUserBandwidth();
+                    if (exitCheck == true) {
+                        continue;
+                    }
+
+                    adminCluster.setClcpu(adminCluster.getClcpu()-userCpu);
+                    adminCluster.setClram(adminCluster.getClram()-userRam);
+                    adminCluster.setClssd(adminCluster.getClssd()-userSsd);
+                    adminCluster.setClgpu(adminCluster.getClgpu()-userGpu);
+                    adminCluster.setClbandwidth(adminCluster.getClbandwidth()-userBandwidth);
+
+                    try {
+                        projectTools.propellerLoading("Creating VM...", 5);
+                        ClusterResources.vmArray.add(new VmNetworkedGPU(4, userOs, userCpu, userRam, userSsd, userGpu, userBandwidth));
+                        System.out.println("VM created!");
+                        Thread.sleep(3000);
+                    } catch (Exception e) {
+                        projectTools.clearConsole();
+                        System.out.println("ERROR: VM could not be created!");
+                        Thread.sleep(3000);
+                        continue;
+                    }
+                    break;
+
+                default:
+                    //Invalid VM Type
+                    projectTools.clearConsole();
+                    System.out.println("ERROR: Please choose a valid type of Virtual Machine!");
+                    Thread.sleep(3000);
+                    continue;
+            }
+        }
     }
 
 }
