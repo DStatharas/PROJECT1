@@ -1,6 +1,6 @@
 package com.JavaNerds.app;
 
-public class Program {
+public class Program{
     
     private Integer pId;
     private Integer pCpu          = 0;

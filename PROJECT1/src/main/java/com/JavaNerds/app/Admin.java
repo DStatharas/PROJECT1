@@ -1552,13 +1552,13 @@ public class Admin{
         Integer minLoadVmId = 0;
 
         for (VM vm : ClusterResources.vmArray) {
-            if (program.getpGpu() > 0 && (vm.vmType != "VmGPU" || vm.vmType != "VmNetworkedGPU")) {
+            if (program.getpGpu() > 0 && (vm.vmType != "VmGPU" && vm.vmType != "VmNetworkedGPU")) {
                 program.setRunCounter(program.getRunCounter()+1);
                 assignCheck = false;
                 continue;
             }
 
-            if (program.getpBandwidth() > 0 && (vm.vmType != "VmNetworked" || vm.vmType != "VmNetworkedGPU")) {
+            if (program.getpBandwidth() > 0 && (vm.vmType != "VmNetworked" && vm.vmType != "VmNetworkedGPU")) {
                 program.setRunCounter(program.getRunCounter()+1);
                 assignCheck = false;
                 continue;
