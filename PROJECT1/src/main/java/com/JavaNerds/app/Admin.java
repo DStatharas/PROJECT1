@@ -1,5 +1,8 @@
 package com.JavaNerds.app;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -201,7 +204,7 @@ public class Admin{
         }
     }
     
-    public void programMenu() throws InterruptedException {
+    public void programMenu() throws InterruptedException, IOException {
             pSet.clear();
             pQueue.clear();
             runningPrograms.clear();
@@ -1706,7 +1709,7 @@ public class Admin{
         });
     }
 
-    public void mainProgramRunManager() throws InterruptedException{
+    public void mainProgramRunManager() throws InterruptedException, IOException{
         projectTools.clearConsole();
         queueProgramsByPriority();
 
@@ -1748,6 +1751,9 @@ public class Admin{
             Thread.sleep(1000);
 
             if (pQueue.isEmpty() && runningPrograms.isEmpty()) {
+                if (failedPrograms.isEmpty() == false) {
+                    serializeFailedPrograms();
+                }
                 projectTools.clearConsole();
                 System.out.println("\n\nPrograms finished! Type "+"Q "+"to continue. ");
                 inputChecker = oneScanner.next();
@@ -1781,6 +1787,13 @@ public class Admin{
         for (Program program : vm.programAssignArray) {
             program.printProgramRunningReport();
         }
+    }
+
+    public void serializeFailedPrograms() throws IOException{
+        FileOutputStream fout = new FileOutputStream("./log/rejected.out");
+        ObjectOutputStream oos = new ObjectOutputStream(fout);
+        oos.writeObject(failedPrograms);
+        oos.close();
     }
 
 }

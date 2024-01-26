@@ -1,6 +1,8 @@
 package com.JavaNerds.app;
 
-public class Program{
+import java.io.Serializable;
+
+public class Program implements Serializable{
     
     private Integer pId;
     private Integer pCpu          = 0;

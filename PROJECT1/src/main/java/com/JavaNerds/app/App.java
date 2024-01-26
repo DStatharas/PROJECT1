@@ -1,11 +1,12 @@
 package com.JavaNerds.app;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class App
 
 {
-    public static void main( String[] args ) throws InterruptedException
+    public static void main( String[] args ) throws InterruptedException, IOException
     {   
         Admin mainAdminInstance = new Admin();
 
