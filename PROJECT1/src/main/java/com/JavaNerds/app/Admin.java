@@ -1,11 +1,10 @@
 package com.JavaNerds.app;
 
+import java.io.Console;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,6 +37,7 @@ public class Admin{
     private Integer totalBandwidth = 0;
     private Boolean assignCheck = false;
     private Boolean pEndCheck = false;
+    private Boolean pResCheck = false;
 
     private Integer userPChoice = null;
     public HashSet<Program> pSet = new HashSet<Program>();
@@ -73,9 +73,7 @@ public class Admin{
                 try {
                     userVmType = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
@@ -92,14 +90,15 @@ public class Admin{
                     adminCluster.setClssd(adminCluster.getClssd()-userSsd);
 
                     try {
+                        
                         projectTools.propellerLoading("Creating VM...", 5);
                         ClusterResources.vmArray.add(new PlainVM(1, userOs, userCpu, userRam, userSsd));
+                        ConsoleColors.setColor(ConsoleColors.GREEN);
                         System.out.println("VM created!");
                         Thread.sleep(3000);
+                        ConsoleColors.reset();
                     } catch (Exception e) {
-                        projectTools.clearConsole();
-                        System.out.println("ERROR: VM could not be created!");
-                        Thread.sleep(3000);
+                        projectTools.colorFlasher("VM could not be created!", 5, 350, ConsoleColors.RED);
                         continue;
                     }
                     
@@ -125,12 +124,12 @@ public class Admin{
                     try {
                         projectTools.propellerLoading("Creating VM...", 5);
                         ClusterResources.vmArray.add(new VmGPU(2, userOs, userCpu, userRam, userSsd, userGpu));
+                        ConsoleColors.setColor(ConsoleColors.GREEN);
                         System.out.println("VM created!");
                         Thread.sleep(3000);
+                        ConsoleColors.reset();
                     } catch (Exception e) {
-                        projectTools.clearConsole();
-                        System.out.println("ERROR: VM could not be created!");
-                        Thread.sleep(3000);
+                        projectTools.colorFlasher("VM could not be created!", 5, 350, ConsoleColors.RED);
                         continue;
                     }
                     break;
@@ -154,12 +153,12 @@ public class Admin{
                     try {
                         projectTools.propellerLoading("Creating VM...", 5);
                         ClusterResources.vmArray.add(new VmNetworked(3, userOs, userCpu, userRam, userSsd, userBandwidth));
+                        ConsoleColors.setColor(ConsoleColors.GREEN);
                         System.out.println("VM created!");
                         Thread.sleep(3000);
+                        ConsoleColors.reset();
                     } catch (Exception e) {
-                        projectTools.clearConsole();
-                        System.out.println("ERROR: VM could not be created!");
-                        Thread.sleep(3000);
+                        projectTools.colorFlasher("VM could not be created!", 5, 350, ConsoleColors.RED);
                         continue;
                     }
                     break;
@@ -188,21 +187,19 @@ public class Admin{
                     try {
                         projectTools.propellerLoading("Creating VM...", 5);
                         ClusterResources.vmArray.add(new VmNetworkedGPU(4, userOs, userCpu, userRam, userSsd, userGpu, userBandwidth));
+                        ConsoleColors.setColor(ConsoleColors.GREEN);
                         System.out.println("VM created!");
                         Thread.sleep(3000);
+                        ConsoleColors.reset();
                     } catch (Exception e) {
-                        projectTools.clearConsole();
-                        System.out.println("ERROR: VM could not be created!");
-                        Thread.sleep(3000);
+                        projectTools.colorFlasher("VM could not be created!", 5, 350, ConsoleColors.RED);
                         continue;
                     }
                     break;
 
                 default:
                     //Invalid VM Type
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Please choose a valid type of Virtual Machine!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Please choose a valid type of Virtual Machine!", 5, 350, ConsoleColors.RED);
                     continue;
             }
         }
@@ -227,9 +224,7 @@ public class Admin{
             try {
                 userPChoice = Integer.parseInt(inputChecker);
             } catch (Exception e) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Invalid input!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                 continue;
             }
 
@@ -279,9 +274,7 @@ public class Admin{
                     }
 
                 default:
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
             }
         }
@@ -298,42 +291,61 @@ public class Admin{
             userSsd = 0;
             userGpu = 0;
             userBandwidth = 0;
-
-            projectTools.clearConsole();
-            System.out.print("Enter number of CPU cores to assign or Q to cancel: ");
-            userCpu = setProgramUserResource();
-            if (exitCheck == true) {
-                break;
+            pResCheck = false;
+            
+            while (pResCheck == false) {
+                projectTools.clearConsole();
+                System.out.print("Enter number of CPU cores to assign or Q to cancel: ");
+                userCpu = setProgramUserResource();
+                if (exitCheck == true) {
+                    break;
+                }
             }
             
-            projectTools.clearConsole();
-            System.out.print("Enter number of GB of RAM to assign or Q to cancel: ");
-            userRam = setProgramUserResource();
-            if (exitCheck == true) {
-                break;
+            pResCheck = false;
+            while (pResCheck == false) {
+                pResCheck = false;
+                projectTools.clearConsole();
+                System.out.print("Enter number of GB of RAM to assign or Q to cancel: ");
+                userRam = setProgramUserResource();
+                if (exitCheck == true) {
+                    break;
+                }
             }
-
-            projectTools.clearConsole();
-            System.out.print("Enter number of GB of SSD storage to assign or Q to cancel: ");
-            userSsd = setProgramUserResource();
-            if (exitCheck == true) {
-                break;
+            
+            pResCheck = false;
+            while (pResCheck == false) {
+                pResCheck = false;
+                projectTools.clearConsole();
+                System.out.print("Enter number of GB of SSD storage to assign or Q to cancel: ");
+                userSsd = setProgramUserResource();
+                if (exitCheck == true) {
+                    break;
+                }
             }
-
-            projectTools.clearConsole();
-            System.out.print("Enter number of GPUs to assign or Q to cancel: ");
-            userGpu = setProgramUserResource();
-            if (exitCheck == true) {
-                break;
+            
+            pResCheck = false;
+            while (pResCheck == false) {
+                pResCheck = false;
+                projectTools.clearConsole();
+                System.out.print("Enter number of GPUs to assign or Q to cancel: ");
+                userGpu = setProgramUserResource();
+                if (exitCheck == true) {
+                    break;
+                }
             }
-
-            projectTools.clearConsole();
-            System.out.print("Enter the amount of bandwidth rate to assign or Q to cancel: ");
-            userBandwidth = setProgramUserResource();
-            if (exitCheck == true) {
-                break;
+            
+            pResCheck = false;
+            while (pResCheck == false) {
+                pResCheck = false;
+                projectTools.clearConsole();
+                System.out.print("Enter the amount of bandwidth rate to assign or Q to cancel: ");
+                userBandwidth = setProgramUserResource();
+                if (exitCheck == true) {
+                    break;
+                }
             }
-
+            
             setUserExpectedTime();
             if (exitCheck == true) {
                 break;
@@ -342,12 +354,12 @@ public class Admin{
             try {
                 projectTools.propellerLoading("Creating Program...", 5);
                 pSet.add(new Program(userCpu, userRam, userSsd, userGpu, userBandwidth, userExpectedTime, pIdCheckProvider(), createPriorityUsingUserResource()));
+                ConsoleColors.setColor(ConsoleColors.GREEN);
                 System.out.println("Program created!");
                 Thread.sleep(3000);
+                ConsoleColors.reset();
             } catch (Exception e) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Program could not be created!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Program could not be created!", 5, 350, ConsoleColors.RED);
                 continue;
             }
             break;
@@ -384,22 +396,19 @@ public class Admin{
                     try {
                         tempVmId = Integer.parseInt(inputChecker);
                     } catch (Exception e) {
-                        projectTools.clearConsole();
-                        System.out.println("ERROR: Invalid input!");
-                        Thread.sleep(3000);
+                        projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                         continue;
                     }
                 }
                 if (findVmById(tempVmId)==null) {
-                    projectTools.clearConsole();
-                    System.out.println("This VM ID does not exist!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("This VM ID does not exist!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
                 else {
-                    projectTools.clearConsole();
+                    ConsoleColors.setColor(ConsoleColors.GREEN);
                     System.out.println("Selected VM"+findVmById(tempVmId).getVmid()+"!");
                     Thread.sleep(3000);
+                    ConsoleColors.reset();
                 }
 
                 break;
@@ -421,9 +430,7 @@ public class Admin{
                     try {
                         resourceToUpdate = Integer.parseInt(inputChecker);
                     } catch (Exception e) {
-                        projectTools.clearConsole();
-                        System.out.println("ERROR: Invalid input!");
-                        Thread.sleep(3000);
+                        projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                         continue;
                     }
                 }
@@ -448,28 +455,23 @@ public class Admin{
                                     userOs = Integer.parseInt(inputChecker);
                                     userOs -= 1;
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Invalid input!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
                             }
                             if (userOs != 0 && userOs != 1 && userOs != 2) {
-                                projectTools.clearConsole();
-                                System.out.println("Please select a valid OS!");
-                                Thread.sleep(3000);
-                                continue;
+                                projectTools.colorFlasher("Please select a valid OS!", 5, 350, ConsoleColors.RED);
                             }
                             
                             try {
                                 projectTools.propellerLoading("Updating VM with the chosen specifications...", 5);
                                 findVmById(tempVmId).setVmOs(userOs);
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
                                 System.out.println("VM updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("Could not update VM!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update VM!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
                             
@@ -497,46 +499,40 @@ public class Admin{
                                 try {
                                     userCpu = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Invalid input!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
                             }
                             if (userCpu <= 0) {
-                                projectTools.clearConsole();
-                                System.out.println("CPU cores are required!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("CPU cores are required!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
                             else if ((findVmById(tempVmId).getVmcpu()-userCpu)+adminCluster.getClcpu() < 0) {
-                                projectTools.clearConsole();
-                                System.out.println("Not enough resources available on the cluster!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
 
                             try {
                                 projectTools.propellerLoading("Updating Cluster...", 5);
                                 adminCluster.setClcpu(adminCluster.getClcpu()+(((PlainVM) findVmById(tempVmId)).getVmcpu()-userCpu));
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
                                 System.out.println("Cluster updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update Cluster!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update Cluster!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
 
                             try {
                                 projectTools.propellerLoading("Updating VM with the assigned specifications....", 5);
                                 ((PlainVM) findVmById(tempVmId)).setVmcpu(userCpu);
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
                                 System.out.println("VM updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update VM!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update VM!", 5, 350, ConsoleColors.RED);
                                 adminCluster.setClcpu(adminCluster.getClcpu()-(((PlainVM) findVmById(resourceToUpdate)).getVmcpu()-userCpu));
                                 continue;
                             }
@@ -566,46 +562,40 @@ public class Admin{
                                 try {
                                     userRam = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Invalid input!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
                             }
                             if (userRam <= 0) {
-                                projectTools.clearConsole();
-                                System.out.println("RAM is required!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("RAM is required!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
                             else if ((findVmById(tempVmId).getVmram()-userCpu)+adminCluster.getClram() < 0) {
-                                projectTools.clearConsole();
-                                System.out.println("Not enough resources available on the cluster!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
 
                             try {
                                 projectTools.propellerLoading("Updating Cluster...", 5);
                                 adminCluster.setClram(adminCluster.getClram()+(((PlainVM) findVmById(tempVmId)).getVmram()-userRam));
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
                                 System.out.println("Cluster updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update Cluster!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update Cluster!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
 
                             try {
                                 projectTools.propellerLoading("Updating VM with the assigned specifications...", resourceToUpdate);
                                 ((PlainVM) findVmById(tempVmId)).setVmram(userRam);
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
                                 System.out.println("VM updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update VM!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update VM!", 5, 350, ConsoleColors.RED);
                                 adminCluster.setClram(adminCluster.getClram()-(((PlainVM) findVmById(tempVmId)).getVmram()-userRam));
                                 continue;
                             }
@@ -623,9 +613,7 @@ public class Admin{
                         projectTools.clearConsole();
 
                         if (findVmById(tempVmId) instanceof PlainVM == false) {
-                            projectTools.clearConsole();
-                            System.out.println("This type of resource is not available to this VM!");
-                            Thread.sleep(3000);
+                            projectTools.colorFlasher("This type of resource is not available to this VM!", 5, 350, ConsoleColors.RED);
                             continue;
                         }
                         
@@ -642,34 +630,28 @@ public class Admin{
                                 try {
                                     userSsd = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Invalid input!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
                             }
                             if (userSsd <= 0) {
-                                projectTools.clearConsole();
-                                System.out.println("SSD storage is required!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("SSD storage is required!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
                             else if ((((PlainVM) findVmById(tempVmId)).getVmssd()-userSsd)+adminCluster.getClssd() < 0) {
-                                projectTools.clearConsole();
-                                System.out.println("Not enough resources available on the cluster!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
 
                             try {
                                 projectTools.propellerLoading("Updating Cluster...", 5);
                                 adminCluster.setClssd(adminCluster.getClssd()+(((PlainVM) findVmById(tempVmId)).getVmssd()-userSsd));
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
                                 System.out.println("Cluster updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update Cluster!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update Cluster!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
                             
@@ -678,12 +660,12 @@ public class Admin{
                             try {
                                 projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
                                 ((PlainVM) findVmById(tempVmId)).setVmssd(userSsd);
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
                                 System.out.println("VM updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update VM!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update VM!", 5, 350, ConsoleColors.RED);
                                 adminCluster.setClssd(adminCluster.getClssd()-(((PlainVM) findVmById(tempVmId)).getVmssd()-userSsd));
                                 continue;
                             }
@@ -701,9 +683,7 @@ public class Admin{
 
                         //GPU
                         if (findVmById(tempVmId) instanceof VmGPU == false) {
-                            projectTools.clearConsole();
-                            System.out.println("This type of resource is not available to this VM!");
-                            Thread.sleep(3000);
+                            projectTools.colorFlasher("This type of resource is not available to this VM!", 5, 350, ConsoleColors.RED);
                             continue;
                         }
                         
@@ -720,22 +700,16 @@ public class Admin{
                                 try {
                                     userGpu = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Invalid input!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
                             }
                             if (userGpu <= 0) {
-                                projectTools.clearConsole();
-                                System.out.println("GPUs are required!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("GPUs are required!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
                             else if ((((VmGPU) findVmById(tempVmId)).getVmgpu()-userGpu)+adminCluster.getClgpu() < 0) {
-                                projectTools.clearConsole();
-                                System.out.println("Not enough resources available on the cluster!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
 
@@ -743,23 +717,24 @@ public class Admin{
                             try {
                                 projectTools.propellerLoading("Updating Cluster...", 5);
                                 adminCluster.setClgpu(adminCluster.getClgpu()+(((VmGPU) findVmById(tempVmId)).getVmgpu()-userGpu));
-                                System.out.println("Cluster Updated!");
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
+                                System.out.println("Cluster updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                System.out.println("ERROR: Could not update Cluster!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update Cluster!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
 
                             try {
                                 projectTools.propellerLoading("Updating VM with the assigned specifications... ", 5);
                                 ((VmGPU) findVmById(tempVmId)).setVmgpu(userGpu);
-                                System.out.println("VM Updated!");
+                                ConsoleColors.setColor(ConsoleColors.GREEN);
+                                System.out.println("VM updated!");
                                 Thread.sleep(3000);
+                                ConsoleColors.reset();
                             } catch (Exception e) {
-                                projectTools.clearConsole();
-                                System.out.println("ERROR: Could not update VM!");
-                                Thread.sleep(3000);
+                                projectTools.colorFlasher("Could not update VM!", 5, 350, ConsoleColors.RED);
                                 adminCluster.setClgpu(adminCluster.getClgpu()-(((VmGPU) findVmById(tempVmId)).getVmgpu()-userGpu));
                                 continue;
                             }
@@ -777,9 +752,7 @@ public class Admin{
 
                         //BANDWIDTH
                         if (findVmById(tempVmId) instanceof VmNetworked == false && findVmById(tempVmId) instanceof VmNetworkedGPU == false) {
-                            projectTools.clearConsole();
-                            System.out.println("This type of resource is not available to this VM!");
-                            Thread.sleep(3000);
+                            projectTools.colorFlasher("This type of resource is not available to this VM!", 5, 350, ConsoleColors.RED);
                             continue;
                         }
                         
@@ -796,87 +769,77 @@ public class Admin{
                                 try {
                                     userBandwidth = Integer.parseInt(inputChecker);
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Invalid input!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
                             }
 
                             if (findVmById(tempVmId) instanceof VmNetworked) {
                                 if (userBandwidth <= 0) {
-                                    projectTools.clearConsole();
-                                    System.out.println("Bandwidth is required in this VM!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Bandwidth is required in this VM!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
                                 else if ((((VmNetworked) findVmById(tempVmId)).getVmbandwidth()-userBandwidth)+adminCluster.getClbandwidth() < 0) {
-                                    projectTools.clearConsole();
-                                    System.out.println("Not enough resources available on the cluster!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
 
                                 try {
                                     projectTools.propellerLoading("Updating Cluster...", 5);
                                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworked) findVmById(tempVmId)).getVmbandwidth()-userBandwidth));
-                                    System.out.println("Cluster Updated!");
+                                    ConsoleColors.setColor(ConsoleColors.GREEN);
+                                    System.out.println("Cluster updated!");
                                     Thread.sleep(3000);
+                                    ConsoleColors.reset();
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Could not update Cluster!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Could not update Cluster!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
 
                                 try {
                                     projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
                                     ((VmNetworked) findVmById(tempVmId)).setVmbandwidth(userBandwidth);
-                                    System.out.println("VM Updated!");
+                                    ConsoleColors.setColor(ConsoleColors.GREEN);
+                                    System.out.println("VM updated!");
                                     Thread.sleep(3000);
+                                    ConsoleColors.reset();
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Could not update VM!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Could not update VM!", 5, 350, ConsoleColors.RED);
                                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()-(((VmNetworked) findVmById(tempVmId)).getVmbandwidth()-userBandwidth));
                                     continue;
                                 }
                             }
                             else if (findVmById(tempVmId) instanceof VmNetworkedGPU) {
                                 if (userBandwidth <= 0) {
-                                projectTools.clearConsole();
-                                System.out.println("Bandwidth is required in this VM!");
-                                Thread.sleep(3000);
+                                    projectTools.colorFlasher("Bandwidth is required in this VM!", 5, 350, ConsoleColors.RED);
                                 continue;
                             }
                                 else if ((((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()-userBandwidth)+adminCluster.getClbandwidth() < 0) {
-                                    projectTools.clearConsole();
-                                    System.out.println("Not enough resources available on the cluster!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
 
                                 try {
                                     projectTools.propellerLoading("Updating Cluster...", 5);
                                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()-userBandwidth));
-                                    System.out.println("Cluster Updated!");
+                                    ConsoleColors.setColor(ConsoleColors.GREEN);
+                                    System.out.println("Cluster updated!");
                                     Thread.sleep(3000);
+                                    ConsoleColors.reset();
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Could not update Cluster!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Could not update Cluster!", 5, 350, ConsoleColors.RED);
                                     continue;
                                 }
 
                                 try {
                                     projectTools.propellerLoading("Updating VM with the assigned specifications...", 5);
                                     ((VmNetworkedGPU) findVmById(tempVmId)).setVmbandwidth(userBandwidth);
-                                    System.out.println("VM Updated!");
+                                    ConsoleColors.setColor(ConsoleColors.GREEN);
+                                    System.out.println("VM updated!");
                                     Thread.sleep(3000);
+                                    ConsoleColors.reset();
                                 } catch (Exception e) {
-                                    projectTools.clearConsole();
-                                    System.out.println("ERROR: Could not update VM!");
-                                    Thread.sleep(3000);
+                                    projectTools.colorFlasher("Could not update VM!", 5, 350, ConsoleColors.RED);
                                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()-(((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()-userBandwidth));
                                     continue;
                                 }
@@ -887,11 +850,9 @@ public class Admin{
 
                         break;
                     
-                    default:
-                        projectTools.clearConsole();
-                        System.out.println("ERROR: Please select a valid option!");
-                        Thread.sleep(3000);
-                        continue;
+                default:
+                    projectTools.colorFlasher("Please select a valid option!", 5, 350, ConsoleColors.RED);
+                    continue;
                 }
             }
             break;
@@ -918,9 +879,7 @@ public class Admin{
                 try {
                     tempVmId = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
@@ -932,8 +891,10 @@ public class Admin{
                     adminCluster.setClssd(adminCluster.getClssd()+(((PlainVM) findVmById(tempVmId)).getVmssd()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
+                    ConsoleColors.setColor(ConsoleColors.GREEN);
                     System.out.println("Cluster updated!");
                     Thread.sleep(3000);
+                    ConsoleColors.reset();
                     break;
 
                 case "VmGPU":
@@ -943,8 +904,10 @@ public class Admin{
                     adminCluster.setClgpu(adminCluster.getClgpu()+(((VmGPU) findVmById(tempVmId)).getVmgpu()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
+                    ConsoleColors.setColor(ConsoleColors.GREEN);
                     System.out.println("Cluster updated!");
                     Thread.sleep(3000);
+                    ConsoleColors.reset();
                     break;
 
                 case "VmNetworked":
@@ -954,8 +917,10 @@ public class Admin{
                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworked) findVmById(tempVmId)).getVmbandwidth()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
+                    ConsoleColors.setColor(ConsoleColors.GREEN);
                     System.out.println("Cluster updated!");
                     Thread.sleep(3000);
+                    ConsoleColors.reset();
                     break;
 
                 case "VmNetworkedGPU":
@@ -966,26 +931,26 @@ public class Admin{
                     adminCluster.setClbandwidth(adminCluster.getClbandwidth()+(((VmNetworkedGPU) findVmById(tempVmId)).getVmbandwidth()));
 
                     projectTools.propellerLoading("Updating Cluster...", 5);
+                    ConsoleColors.setColor(ConsoleColors.GREEN);
                     System.out.println("Cluster updated!");
                     Thread.sleep(3000);
+                    ConsoleColors.reset();
                     break;
 
                 default:
-                projectTools.clearConsole();
-                    System.out.println("VM Type not recognized!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("VM type not recognized!", 5, 350, ConsoleColors.RED);
                     continue;
             }
 
             try {
                 ClusterResources.vmArray.remove(findVmById(tempVmId));
                 projectTools.propellerLoading("Deleting VM...", 5);
+                ConsoleColors.setColor(ConsoleColors.GREEN);
                 System.out.println("VM deleted!");
                 Thread.sleep(3000);
+                ConsoleColors.reset();
             } catch (Exception e) {
-                projectTools.clearConsole();
-                System.out.println("This VM id does not exist!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("This VM ID does not exist!", 5, 350, ConsoleColors.RED);
                 continue;
             }
             break;
@@ -1027,16 +992,12 @@ public class Admin{
                     userOs = Integer.parseInt(inputChecker);
                     userOs -= 1;
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
             if (userOs != 0 && userOs != 1 && userOs != 2) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Please select a valid OS!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Please select a valid OS!", 5, 350, ConsoleColors.RED);
                 continue;
             }
 
@@ -1064,23 +1025,17 @@ public class Admin{
                 try {
                     userCpu = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
             if (userCpu <= 0) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: CPU cores are required!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("CPU cores are required!", 5, 350, ConsoleColors.RED);
                 continue;
             }
             
             else if (userCpu > adminCluster.getClcpu()) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Not enough resources available on the cluster!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                 continue;
             }
 
@@ -1108,22 +1063,16 @@ public class Admin{
                 try {
                     userRam = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
             if (userRam <= 0) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: RAM is required!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("RAM is required!", 5, 350, ConsoleColors.RED);
                 continue;
             }
             else if (userRam > adminCluster.getClram()) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Not enough resources available on the cluster!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                 continue;
             }
 
@@ -1151,22 +1100,16 @@ public class Admin{
                 try {
                     userSsd = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
             if (userSsd <= 0) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: SSD storage is required!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("SSD storage is required!", 5, 350, ConsoleColors.RED);
                 continue;
             }
             else if (userSsd > adminCluster.getClssd()) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Not enough resources available on the cluster!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                 continue;
             }
 
@@ -1194,22 +1137,16 @@ public class Admin{
                 try {
                     userGpu = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
             if (userGpu <= 0) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: GPUs are required!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("GPUs are required!", 5, 350, ConsoleColors.RED);
                 continue;
             }
             else if (userGpu > adminCluster.getClgpu()) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Not enough resources available on the cluster!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                 continue;
             }
 
@@ -1237,22 +1174,16 @@ public class Admin{
                 try {
                     userBandwidth = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
             if (userBandwidth <= 0) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Bandwidth is required!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Bandwidth is required!", 5, 350, ConsoleColors.RED);
                 continue;
             }
             else if (userBandwidth > adminCluster.getClbandwidth()) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Not enough resources available on the cluster!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Not enough resources available to the Cluster!", 5, 350, ConsoleColors.RED);
                 continue;
             }
 
@@ -1277,19 +1208,18 @@ public class Admin{
                 try {
                     userResource = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
-                    continue;
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
+                    pResCheck = false;
+                    return 0;
                 }
             }
             if (userResource < 0) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Resources cannot be negative!");
-                Thread.sleep(3000);
-                continue;
+                projectTools.colorFlasher("Resources cannot be negative!", 5, 350, ConsoleColors.RED);
+                pResCheck = false;
+                return 0;
             }
 
+            pResCheck = true;
             return userResource;
         }
     }
@@ -1313,16 +1243,12 @@ public class Admin{
                 try {
                     userExpectedTime = Integer.parseInt(inputChecker);
                 } catch (Exception e) {
-                    projectTools.clearConsole();
-                    System.out.println("ERROR: Invalid input!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
             }
             if (userExpectedTime <= 0) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Execution time cannot be 0!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Execution time cannot be 0!", 5, 350, ConsoleColors.RED);
                 continue;
             }
 
@@ -1373,9 +1299,7 @@ public class Admin{
                             ConsoleColors.reset();
                             System.out.println("\n");
                         } catch (Exception e) {
-                            projectTools.clearConsole();
-                            System.out.println("ERROR: Cannot print VM(s)!");
-                            Thread.sleep(3000);
+                            projectTools.colorFlasher("Cannot print VMs!", 5, 350, ConsoleColors.RED);
                             break;
                         }
                     }
@@ -1391,16 +1315,12 @@ public class Admin{
                     try {
                         tempVmId = Integer.parseInt(inputChecker);
                     } catch (Exception e) {
-                        projectTools.clearConsole();
-                        System.out.println("ERROR: Invalid input!");
-                        Thread.sleep(3000);
+                        projectTools.colorFlasher("Invalid Input!", 5, 350, ConsoleColors.RED);
                         continue;
                     }
                 }
                 if (findVmById(tempVmId) == null) {
-                    projectTools.clearConsole();
-                    System.out.println("This VM ID does not exist!");
-                    Thread.sleep(3000);
+                    projectTools.colorFlasher("This VM ID does not exist!", 5, 350, ConsoleColors.RED);
                     continue;
                 }
                 else {
@@ -1465,9 +1385,7 @@ public class Admin{
                 program.printProgramReport();
                 System.out.println();
             } catch (Exception e) {
-                projectTools.clearConsole();
-                System.out.println("ERROR: Cannot print Program(s)!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Cannot print programs!", 5, 350, ConsoleColors.RED);
                 break;
             }
         }
@@ -1506,9 +1424,7 @@ public class Admin{
                 }
             }
         } else {
-            projectTools.clearConsole();
-            System.out.println("ERROR: Cannot set total resources - no available VMs!");
-            Thread.sleep(3000);
+            projectTools.colorFlasher("Cannot set total resources - no available VMs!", 5, 350, ConsoleColors.RED);
         }
     }
 
@@ -1663,9 +1579,7 @@ public class Admin{
             default:
                 vm.setAllocvmcpu(vm.getAllocvmcpu()-program.getpCpu());
                 vm.setAllocvmram(vm.getAllocvmram()-program.getpRam());
-                projectTools.clearConsole();
-                System.out.println("ERROR: Could not assign resources!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Could not assign resources!", 5, 350, ConsoleColors.RED);
                 break;
         }
     }
@@ -1702,9 +1616,7 @@ public class Admin{
             default:
                 vm.setAllocvmcpu(vm.getAllocvmcpu()+program.getpCpu());
                 vm.setAllocvmram(vm.getAllocvmram()+program.getpRam());
-                projectTools.clearConsole();
-                System.out.println("ERROR: Could not deassign resources!");
-                Thread.sleep(3000);
+                projectTools.colorFlasher("Could not unassign resources!", 5, 350, ConsoleColors.RED);
                 break;
         }
     }
