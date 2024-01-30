@@ -62,7 +62,7 @@ public class Program implements Serializable{
 
     public void printProgramReport() {
         ConsoleColors.setColor(ConsoleColors.GREEN);
-        System.out.print("------ ~<Program #"+this.pId+">~ -----");
+        System.out.print("-------- ~<Program #"+this.pId+">~ ---------");
         System.out.print("\nCPU Cores: "+this.pCpu);
         System.out.print("\nRAM: "+this.pRam+" GB");
         System.out.print("\nSSD: "+this.pSsd+" GB");
@@ -73,17 +73,17 @@ public class Program implements Serializable{
             System.out.println("\nBandwidth: "+this.pBandwidth+" Gb/sec");
         }
         System.out.println("\nExpected Execution Time: "+this.expectedTime+"sec");
-        System.out.println("------------------------------");
+        System.out.println("-----------------------------------");
         ConsoleColors.reset();
     }
 
     public void printProgramRunningReport(){
         ConsoleColors.setColor(ConsoleColors.GREEN);
         System.out.println("\n        |");
-        System.out.print("----- ~<Program "+this.pId+">~ -----"+"\n");
+        System.out.print("--------- ~<Program "+this.pId+">~ ---------"+"\n");
         System.out.println("Uptime: "+getExecutionTimeInSeconds()+"sec");
         System.out.println("Expected Execution Time: "+this.expectedTime+"sec");
-        System.out.print("---------------------------");
+        System.out.print("-----------------------------------");
         ConsoleColors.reset();;
     }
 

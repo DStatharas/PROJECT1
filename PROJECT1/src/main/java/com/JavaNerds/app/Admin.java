@@ -258,7 +258,10 @@ public class Admin{
 
                 case 0:
                     inputChecker = null;
+                    projectTools.clearConsole();
+                    ConsoleColors.setColor(ConsoleColors.YELLOW);
                     System.out.print("Are you sure you want to quit? All unsaved changes will be lost!\nY/N: ");
+                    ConsoleColors.reset();
                     try {
                         inputChecker = oneScanner.next();
                         oneScanner.nextLine();
@@ -266,7 +269,9 @@ public class Admin{
                         continue;
                     }
                     if (inputChecker.equalsIgnoreCase("y")) {
+                        ConsoleColors.setColor(ConsoleColors.RED);
                         projectTools.propellerLoading("\n\n   Terminating Application..." , 10);
+                        ConsoleColors.reset();
                         break prloop;
                     }
                     else {
@@ -1294,10 +1299,7 @@ public class Admin{
                     for (VM element : ClusterResources.vmArray) {
                         try {
                             element.printVmReport();
-                            ConsoleColors.setColor(ConsoleColors.CYAN);
-                            System.out.println("-------------------");
-                            ConsoleColors.reset();
-                            System.out.println("\n");
+                            System.out.println("\n\n");
                         } catch (Exception e) {
                             projectTools.colorFlasher("Cannot print VMs!", 5, 350, ConsoleColors.RED);
                             break;
@@ -1329,9 +1331,8 @@ public class Admin{
                             projectTools.clearConsole();
                             ((PlainVM) findVmById(tempVmId)).printVmReport();
                             ConsoleColors.setColor(ConsoleColors.CYAN);
-                            System.out.println("-------------------");
                             ConsoleColors.reset();
-                            System.out.print("\nPress Enter to continue...\n");
+                            System.out.print("\n\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
                         
@@ -1339,9 +1340,8 @@ public class Admin{
                             projectTools.clearConsole();
                             ((VmGPU) findVmById(tempVmId)).printVmReport();
                             ConsoleColors.setColor(ConsoleColors.CYAN);
-                            System.out.println("-------------------");
                             ConsoleColors.reset();
-                            System.out.print("\nPress Enter to continue...\n");
+                            System.out.print("\n\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
 
@@ -1349,9 +1349,8 @@ public class Admin{
                             projectTools.clearConsole();
                             ((VmNetworked) findVmById(tempVmId)).printVmReport();
                             ConsoleColors.setColor(ConsoleColors.CYAN);
-                            System.out.println("-------------------");
                             ConsoleColors.reset();
-                            System.out.print("\nPress Enter to continue...\n");
+                            System.out.print("\n\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
 
@@ -1359,16 +1358,13 @@ public class Admin{
                             projectTools.clearConsole();
                             ((VmNetworkedGPU) findVmById(tempVmId)).printVmReport();
                             ConsoleColors.setColor(ConsoleColors.CYAN);
-                            System.out.println("-------------------\n");
                             ConsoleColors.reset();
-                            System.out.print("\nPress Enter to continue...");
+                            System.out.print("\n\nPress Enter to continue...");
                             oneScanner.nextLine();
                             continue;
 
                         default:
-                            projectTools.clearConsole();
-                            System.out.println("Invalid VM type!");
-                            Thread.sleep(3000);
+                            projectTools.colorFlasher("Invalid VM type!", 5, 350, ConsoleColors.RED);
                             continue;
                     }
                 }
@@ -1378,7 +1374,7 @@ public class Admin{
     public void reportAllPrograms() throws InterruptedException {
         projectTools.clearConsole();
         ConsoleColors.setColor(ConsoleColors.GREEN);
-        System.out.println("------------------------\n  Total Program Report\n------------------------\n\n");
+        System.out.println("------------------------------\n     Total Program Report\n------------------------------\n\n");
         ConsoleColors.reset();
         for (Program program : pSet) {
             try {

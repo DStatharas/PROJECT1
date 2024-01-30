@@ -49,7 +49,9 @@ public class App
             switch (intChecker) {
                 case 0:
                     inputChecker = null;
+                    ConsoleColors.setColor(ConsoleColors.YELLOW);
                     System.out.print("Are you sure you want to quit? All unsaved changes will be lost!\nY/N: ");
+                    ConsoleColors.reset();
                     try {
                         inputChecker = oneScanner.next();
                         oneScanner.nextLine();
@@ -57,7 +59,9 @@ public class App
                         continue;
                     }
                     if (inputChecker.equalsIgnoreCase("y")) {
+                        ConsoleColors.setColor(ConsoleColors.RED);
                         projectTools.propellerLoading("\n\n   Terminating Application..." , 10);
+                        ConsoleColors.reset();
                         break mloop;
                     }
                     else {
