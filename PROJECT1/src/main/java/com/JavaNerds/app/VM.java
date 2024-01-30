@@ -46,6 +46,7 @@ abstract class VM{
 
     public void printVmReport() {
         vmReportArrayAdder();
+        ConsoleColors.setColor(ConsoleColors.CYAN);
         System.out.print("----- ~/VM"+this.vmid+"\\~ -----"+"\n");
         System.out.print("VM Type: "+this.vmType+"\n");
         System.out.print("VM OS: "+this.vmOs+"\n");
@@ -59,6 +60,7 @@ abstract class VM{
         }
         printLoad();
         System.out.print("-------------------");
+        ConsoleColors.reset();
     }
 
     public void calculateVmLoad() {
@@ -69,11 +71,20 @@ abstract class VM{
 
         a = ((double)this.vmcpu);
         b = ((double)this.allocvmcpu);
-        cpuDiv = b/a;
+        if (a != 0) {
+            cpuDiv = b/a;
+        }else{
+            cpuDiv = 0;
+        }
+        
 
         a = ((double)this.vmram);
         b = ((double)this.allocvmram);
-        ramDiv = b/a;
+        if (a != 0) {
+            ramDiv = b/a;
+        }else{
+            ramDiv = 0;
+        }
 
         this.vmLoad = (cpuDiv+ramDiv)/2;
     }

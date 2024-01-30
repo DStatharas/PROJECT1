@@ -16,6 +16,7 @@ public class Program implements Serializable{
     private Double  priority      = 0.0;
     private Integer runCounter    = 0;
     private Integer assignedVm    = 0;
+    private Boolean failingCheck  = false;
 
     public Program(Integer pCpu, Integer pRam, Integer pSsd, Integer pGpu, Integer pBandwidth, Integer expectedTime, Integer pId, Double priority) {
            this.pCpu = pCpu;
@@ -60,29 +61,41 @@ public class Program implements Serializable{
     }
 
     public void printProgramReport() {
-        System.out.print("------ ~<Program #"+this.pId+">~ -----"+"\n");
-        System.out.print("CPU Cores: "+this.pCpu+"\n");
-        System.out.print("RAM: "+this.pRam+" GB"+"\n");
-        System.out.print("SSD: "+this.pSsd+" GB"+"\n");
+        ConsoleColors.setColor(ConsoleColors.GREEN);
+        System.out.print("------ ~<Program #"+this.pId+">~ -----");
+        System.out.print("\nCPU Cores: "+this.pCpu);
+        System.out.print("\nRAM: "+this.pRam+" GB");
+        System.out.print("\nSSD: "+this.pSsd+" GB");
         if (this.pGpu > 0) {
-            System.out.print("GPUs: "+this.pGpu+"\n");
+            System.out.print("\nGPUs: "+this.pGpu);
         }
         if (this.pBandwidth > 0) {
-            System.out.println("Bandwidth: "+this.pBandwidth+" Gb/sec"+"\n");
+            System.out.println("\nBandwidth: "+this.pBandwidth+" Gb/sec");
         }
-        System.out.println("Expected Execution Time: "+this.expectedTime+"sec");
+        System.out.println("\nExpected Execution Time: "+this.expectedTime+"sec");
         System.out.println("------------------------------");
+        ConsoleColors.reset();
     }
 
     public void printProgramRunningReport(){
-        System.out.print("\n        |\n");
+        ConsoleColors.setColor(ConsoleColors.GREEN);
+        System.out.println("\n        |");
         System.out.print("----- ~<Program "+this.pId+">~ -----"+"\n");
         System.out.println("Uptime: "+getExecutionTimeInSeconds()+"sec");
         System.out.println("Expected Execution Time: "+this.expectedTime+"sec");
-        System.out.println("---------------------------");
+        System.out.print("---------------------------");
+        ConsoleColors.reset();;
     }
 
     //Getters/Setters
+
+    public Boolean getFailingCheck() {
+        return failingCheck;
+    }
+
+    public void setFailingCheck(Boolean failingCheck) {
+        this.failingCheck = failingCheck;
+    }
 
     public Integer getAssignedVm() {
         return assignedVm;

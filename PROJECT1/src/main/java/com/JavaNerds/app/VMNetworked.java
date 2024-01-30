@@ -32,19 +32,35 @@ public class VmNetworked extends PlainVM{
 
         a = ((double)this.vmcpu);
         b = ((double)this.allocvmcpu);
-        cpuDiv = b/a;
+        if (a != 0) {
+            cpuDiv = b/a;
+        }else{
+            cpuDiv = 0;
+        }
 
         a = ((double)this.vmram);
         b = ((double)this.allocvmram);
-        ramDiv = b/a;
+        if (a != 0) {
+            ramDiv = b/a;
+        }else{
+            ramDiv = 0;
+        }
 
         a = ((double)this.vmssd);
         b = ((double)this.allocvmssd);
-        ssdDiv = b/a;
+        if (a != 0) {
+            ssdDiv = b/a;
+        }else{
+            ssdDiv = 0;
+        }
 
         a = ((double)this.vmbandwidth);
         b = ((double)this.allocvmbandwidth);
-        bandDiv = b/a;
+        if (a != 0) {
+            bandDiv = b/a;
+        }else{
+            bandDiv = 0;
+        }
 
         this.vmLoad = (cpuDiv+ramDiv+ssdDiv+bandDiv)/4;
     }

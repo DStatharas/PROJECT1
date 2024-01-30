@@ -22,7 +22,7 @@ public class App
             projectTools.clearConsole();
 
             ConsoleColors.setColor(ConsoleColors.CYAN_BOLD);
-            System.out.println("Welcome to Virtual Manager 2024: Cluster Boogaloo!\n");
+            System.out.println("Welcome to Cluster & Virtual Machine Simulation by JavaNerds!\n");
             ConsoleColors.reset();
 
             ConsoleColors.setColor(ConsoleColors.BLUE);

@@ -42,6 +42,7 @@ public class Admin{
     public ArrayList<Program> runningPrograms = new ArrayList<Program>();
     public ArrayList<Program> completedPrograms = new ArrayList<Program>();
     public ArrayList<Program> failedPrograms = new ArrayList<Program>();
+    public ArrayList<Program> failingPrograms = new ArrayList<Program>();
 
     public void createVM() throws InterruptedException {
         Integer userVmType = null;
@@ -214,8 +215,6 @@ public class Admin{
         prloop: while (true) {
             inputChecker = null;
             userPChoice = null;
-
-
 
             projectTools.clearConsole();
 
@@ -1360,11 +1359,15 @@ public class Admin{
 
                 if (inputChecker.equalsIgnoreCase("a")) {
                     projectTools.clearConsole();
+                    ConsoleColors.setColor(ConsoleColors.CYAN);
                     System.out.println("-------------------\n  Total VM Report\n-------------------\n\n");
+                    ConsoleColors.reset();
                     for (VM element : ClusterResources.vmArray) {
                         try {
                             element.printVmReport();
+                            ConsoleColors.setColor(ConsoleColors.CYAN);
                             System.out.println("-------------------");
+                            ConsoleColors.reset();
                             System.out.println("\n");
                         } catch (Exception e) {
                             projectTools.clearConsole();
@@ -1402,7 +1405,9 @@ public class Admin{
                         case "PlainVM":
                             projectTools.clearConsole();
                             ((PlainVM) findVmById(tempVmId)).printVmReport();
+                            ConsoleColors.setColor(ConsoleColors.CYAN);
                             System.out.println("-------------------");
+                            ConsoleColors.reset();
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
@@ -1410,7 +1415,9 @@ public class Admin{
                         case "VmGPU":
                             projectTools.clearConsole();
                             ((VmGPU) findVmById(tempVmId)).printVmReport();
+                            ConsoleColors.setColor(ConsoleColors.CYAN);
                             System.out.println("-------------------");
+                            ConsoleColors.reset();
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
@@ -1418,7 +1425,9 @@ public class Admin{
                         case "VmNetworked":
                             projectTools.clearConsole();
                             ((VmNetworked) findVmById(tempVmId)).printVmReport();
+                            ConsoleColors.setColor(ConsoleColors.CYAN);
                             System.out.println("-------------------");
+                            ConsoleColors.reset();
                             System.out.print("\nPress Enter to continue...\n");
                             oneScanner.nextLine();
                             continue;
@@ -1426,7 +1435,9 @@ public class Admin{
                         case "VmNetworkedGPU":
                             projectTools.clearConsole();
                             ((VmNetworkedGPU) findVmById(tempVmId)).printVmReport();
+                            ConsoleColors.setColor(ConsoleColors.CYAN);
                             System.out.println("-------------------\n");
+                            ConsoleColors.reset();
                             System.out.print("\nPress Enter to continue...");
                             oneScanner.nextLine();
                             continue;
@@ -1443,11 +1454,13 @@ public class Admin{
 
     public void reportAllPrograms() throws InterruptedException {
         projectTools.clearConsole();
+        ConsoleColors.setColor(ConsoleColors.GREEN);
         System.out.println("------------------------\n  Total Program Report\n------------------------\n\n");
+        ConsoleColors.reset();
         for (Program program : pSet) {
             try {
                 program.printProgramReport();
-                System.out.println("\n");
+                System.out.println();
             } catch (Exception e) {
                 projectTools.clearConsole();
                 System.out.println("ERROR: Cannot print Program(s)!");
@@ -1556,14 +1569,16 @@ public class Admin{
 
         for (VM vm : ClusterResources.vmArray) {
             if (program.getpGpu() > 0 && (vm.vmType != "VmGPU" && vm.vmType != "VmNetworkedGPU")) {
-                program.setRunCounter(program.getRunCounter()+1);
+                // program.setRunCounter(program.getRunCounter()+1);
                 assignCheck = false;
+                program.setFailingCheck(true);
                 continue;
             }
 
             if (program.getpBandwidth() > 0 && (vm.vmType != "VmNetworked" && vm.vmType != "VmNetworkedGPU")) {
-                program.setRunCounter(program.getRunCounter()+1);
+                // program.setRunCounter(program.getRunCounter()+1);
                 assignCheck = false;
+                program.setFailingCheck(true);
                 continue;
             }
 
@@ -1593,13 +1608,14 @@ public class Admin{
 
         if (minLoadVmId == 0) {
             program.setRunCounter(program.getRunCounter()+1);
+            program.setFailingCheck(true);
             assignCheck = false;
             return;
         }
 
         
         assignResources(program, findVmById(minLoadVmId));
-        findVmById(minLoadVmId).calculateVmLoad();
+        // findVmById(minLoadVmId).calculateVmLoad();
         program.startExecutionTimer();
         findVmById(minLoadVmId).programAssignArray.add(program);
         program.setAssignedVm(minLoadVmId);
@@ -1615,25 +1631,35 @@ public class Admin{
         switch (vm.vmType) {
             case "PlainVM":
                 ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()+program.getpSsd());
+                vm.calculateVmLoad();
+                program.setFailingCheck(false);
                 break;
             
             case "VmGPU":
                 ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()+program.getpSsd());
                 ((VmGPU)vm).setAllocvmgpu(((VmGPU)vm).getAllocvmgpu()+program.getpGpu());
+                vm.calculateVmLoad();
+                program.setFailingCheck(false);
                 break;
 
             case "VmNetworked":
                 ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()+program.getpSsd());
                 ((VmNetworked)vm).setAllocvmbandwidth(((VmNetworked)vm).getAllocvmbandwidth()+program.getpBandwidth());
+                vm.calculateVmLoad();
+                program.setFailingCheck(false);
                 break;
 
             case "VmNetworkedGPU":
                 ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()+program.getpSsd());
                 ((VmGPU)vm).setAllocvmgpu(((VmGPU)vm).getAllocvmgpu()+program.getpGpu());
                 ((VmNetworkedGPU)vm).setAllocvmbandwidth(((VmNetworkedGPU)vm).getAllocvmbandwidth()+program.getpBandwidth());
+                vm.calculateVmLoad();
+                program.setFailingCheck(false);
                 break;
 
             default:
+                vm.setAllocvmcpu(vm.getAllocvmcpu()-program.getpCpu());
+                vm.setAllocvmram(vm.getAllocvmram()-program.getpRam());
                 projectTools.clearConsole();
                 System.out.println("ERROR: Could not assign resources!");
                 Thread.sleep(3000);
@@ -1648,25 +1674,31 @@ public class Admin{
         switch (vm.vmType) {
             case "PlainVM":
                 ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()-program.getpSsd());
+                vm.calculateVmLoad();
                 break;
             
             case "VmGPU":
                 ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()-program.getpSsd());
                 ((VmGPU)vm).setAllocvmgpu(((VmGPU)vm).getAllocvmgpu()-program.getpGpu());
+                vm.calculateVmLoad();
                 break;
 
             case "VmNetworked":
                 ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()-program.getpSsd());
                 ((VmNetworked)vm).setAllocvmbandwidth(((VmNetworked)vm).getAllocvmbandwidth()-program.getpBandwidth());
+                vm.calculateVmLoad();
                 break;
 
             case "VmNetworkedGPU":
                 ((PlainVM)vm).setAllocvmssd(((PlainVM)vm).getAllocvmssd()-program.getpSsd());
                 ((VmGPU)vm).setAllocvmgpu(((VmGPU)vm).getAllocvmgpu()-program.getpGpu());
                 ((VmNetworkedGPU)vm).setAllocvmbandwidth(((VmNetworkedGPU)vm).getAllocvmbandwidth()-program.getpBandwidth());
+                vm.calculateVmLoad();
                 break;
 
             default:
+                vm.setAllocvmcpu(vm.getAllocvmcpu()+program.getpCpu());
+                vm.setAllocvmram(vm.getAllocvmram()+program.getpRam());
                 projectTools.clearConsole();
                 System.out.println("ERROR: Could not deassign resources!");
                 Thread.sleep(3000);
@@ -1713,8 +1745,6 @@ public class Admin{
         projectTools.clearConsole();
         queueProgramsByPriority();
 
-
-
         while (pEndCheck == false) {
             assignCheck = true;
             projectTools.clearConsole();
@@ -1723,8 +1753,10 @@ public class Admin{
                 assignProgramToBestVM(pQueue.getFirst());
             }
             
+            removeFromFailingPrograms();
+
             if (assignCheck == false) {
-                if (pQueue.getFirst().getRunCounter() > 3) {
+                if (pQueue.getFirst().getRunCounter() > 5) {
                     failedPrograms.add(pQueue.getFirst());
                     pQueue.removeFirst();
                 }
@@ -1748,13 +1780,18 @@ public class Admin{
                 System.out.println("\n\n");
             }
 
+            addToFailingPrograms();
+            printFailingPrograms();
+            System.out.println("\n");
+            printFailedPrograms();
+
             Thread.sleep(1000);
 
             if (pQueue.isEmpty() && runningPrograms.isEmpty()) {
                 if (failedPrograms.isEmpty() == false) {
                     serializeFailedPrograms();
                 }
-                projectTools.clearConsole();
+                
                 System.out.println("\n\nPrograms finished! Type "+"Q "+"to continue. ");
                 inputChecker = oneScanner.next();
                 oneScanner.nextLine();
@@ -1763,6 +1800,55 @@ public class Admin{
                 }
             }
         }
+    }
+
+    public void printFailedPrograms(){
+        ConsoleColors.setColor(ConsoleColors.RED);
+        System.out.println("-------- :Failed Programs: --------");
+            if (failedPrograms.isEmpty()) {
+                System.out.print("         No failed programs!         ");
+            }else{
+                for (Iterator<Program> iterator = failedPrograms.iterator(); iterator.hasNext();) {
+                    Program pr = iterator.next();
+                    System.out.print(" <P #"+pr.getpId()+"> ");
+            }
+        }
+        System.out.print("\n-----------------------------------");
+        ConsoleColors.reset();
+    }
+
+    public void addToFailingPrograms(){
+        for (Iterator<Program> iterator = pQueue.iterator(); iterator.hasNext();) {
+            Program p = iterator.next();
+            if (p.getRunCounter() > 0 && failingPrograms.contains(p) == false) {
+                failingPrograms.add(p);
+            }
+        }
+    }
+
+    public void removeFromFailingPrograms(){
+        for (Iterator<Program> iterator = failingPrograms.iterator(); iterator.hasNext();) {
+            Program p = iterator.next();
+            if (p.getRunCounter() > 5 || p.getFailingCheck() == false) {
+                iterator.remove();
+                failingPrograms.remove(p);
+            }
+        }
+    }
+
+    public void printFailingPrograms(){
+        ConsoleColors.setColor(ConsoleColors.YELLOW);
+        System.out.println("------- :Requeuing Programs: ------");
+            if (failingPrograms.isEmpty()) {
+                System.out.print("       No requeuing programs!       ");
+            }else{
+                for (Iterator<Program> iterator = failingPrograms.iterator(); iterator.hasNext();) {
+                    Program pr = iterator.next();
+                    System.out.print(" <P #"+pr.getpId()+"-"+pr.getRunCounter()+"> ");
+            }
+        }
+        System.out.print("\n-----------------------------------");
+        ConsoleColors.reset();
     }
 
     public void removeProgramFromVMOnTimeOut(Program program, VM vm) throws InterruptedException{

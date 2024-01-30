@@ -75,10 +75,10 @@ public class ConsoleColors {
     public static final String WHITE_BACKGROUND_BRIGHT = "\033[0;107m";   // WHITE
 
     public static void setColor(String color) {
-        System.out.println(color);
+        System.out.print(color);
     }
 
     public static void reset() {
-        System.out.println(RESET);
+        System.out.print(RESET);
     }
 }

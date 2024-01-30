@@ -32,15 +32,27 @@ public class PlainVM extends VM{
 
         a = ((double)this.vmcpu);
         b = ((double)this.allocvmcpu);
-        cpuDiv = b/a;
+        if (a != 0) {
+            cpuDiv = b/a;
+        }else{
+            cpuDiv = 0;
+        }
 
         a = ((double)this.vmram);
         b = ((double)this.allocvmram);
-        ramDiv = b/a;
+        if (a != 0) {
+            ramDiv = b/a;
+        }else{
+            ramDiv = 0;
+        }
 
         a = ((double)this.vmssd);
         b = ((double)this.allocvmssd);
-        ssdDiv = b/a;
+        if (a != 0) {
+            ssdDiv = b/a;
+        }else{
+            ssdDiv = 0;
+        }
 
         this.vmLoad = (cpuDiv+ramDiv+ssdDiv)/3;
     }
