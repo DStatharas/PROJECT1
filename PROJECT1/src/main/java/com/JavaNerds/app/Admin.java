@@ -1,8 +1,11 @@
 package com.JavaNerds.app;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1806,7 +1809,7 @@ public class Admin{
         ConsoleColors.setColor(ConsoleColors.RED);
         System.out.println("-------- :Failed Programs: --------");
             if (failedPrograms.isEmpty()) {
-                System.out.print("         No failed programs!         ");
+                System.out.print("        No failed programs!         ");
             }else{
                 for (Iterator<Program> iterator = failedPrograms.iterator(); iterator.hasNext();) {
                     Program pr = iterator.next();
@@ -1876,7 +1879,13 @@ public class Admin{
     }
 
     public void serializeFailedPrograms() throws IOException{
-        FileOutputStream fout = new FileOutputStream("./log/rejected.out");
+        String directoryPath = System.getProperty("user.dir") + File.separator + "log";
+        String fileName = directoryPath + File.separator + "rejected.out";
+        File logDirectory = new File(directoryPath);
+        if (!logDirectory.exists()) {
+            logDirectory.mkdirs();
+        }
+        FileOutputStream fout = new FileOutputStream(fileName);
         ObjectOutputStream oos = new ObjectOutputStream(fout);
         oos.writeObject(failedPrograms);
         oos.close();
